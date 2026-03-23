@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, ChevronRight } from "lucide-react";
 
@@ -18,10 +19,13 @@ export default function Home() {
           <a href="#capabilities" className="hover:text-white transition-colors">Capabilities</a>
           <a href="#teams" className="hover:text-white transition-colors">Teams</a>
         </div>
-        <button className="group flex items-center gap-2 border border-white/20 px-5 py-2 font-mono text-[10px] tracking-wider uppercase transition-all hover:bg-white hover:text-black">
+        <Link
+          className="group flex items-center gap-2 border border-white/20 px-5 py-2 font-mono text-[10px] tracking-wider uppercase transition-all hover:bg-white hover:text-black"
+          href="/book"
+        >
           Book a Demo
           <ArrowUpRight className="h-3 w-3" />
-        </button>
+        </Link>
       </nav>
 
       {/* SECTION 1 — HERO SECTION — THE ECLIPSE */}
@@ -56,9 +60,12 @@ export default function Home() {
           </p>
 
           <div className="reveal-up mt-10 flex flex-col items-start gap-6 sm:flex-row" style={{ animationDelay: "700ms" }}>
-            <button className="h-16 min-w-[240px] border border-white bg-white px-8 font-mono text-[10px] tracking-[0.15em] uppercase text-black transition-all hover:bg-transparent hover:text-white">
+            <Link
+              className="inline-flex h-16 min-w-[240px] items-center justify-center border border-white bg-white px-8 font-mono text-[10px] tracking-[0.15em] uppercase text-black transition-all hover:bg-transparent hover:text-white"
+              href="/book"
+            >
               Book a Demo
-            </button>
+            </Link>
             <button className="flex h-16 items-center gap-4 px-8 font-mono text-[10px] tracking-[0.15em] uppercase text-white/60 transition-all hover:text-white">
               See How It Works
               <ChevronRight className="h-4 w-4" />
@@ -237,9 +244,12 @@ export default function Home() {
           </h2>
 
           <div className="mt-24">
-            <button className="h-20 min-w-[320px] bg-white px-12 font-mono text-xs tracking-[0.2em] uppercase text-black hover:bg-neutral-200 transition-all">
+            <Link
+              className="inline-flex h-20 min-w-[320px] items-center justify-center bg-white px-12 font-mono text-xs tracking-[0.2em] uppercase text-black hover:bg-neutral-200 transition-all"
+              href="/book"
+            >
               Book a Demo
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -280,7 +290,7 @@ export default function Home() {
           
           <div className="mt-48 flex flex-col items-center justify-between border-t border-white/[0.05] pt-16 md:flex-row">
             <div className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase mb-12 md:mb-0">
-              // ovrmn // AI TEAMMATES // 2026
+              OVRMN // AI TEAMMATES // 2026
             </div>
             <div className="flex gap-16 font-mono text-[10px] tracking-[0.15em] text-white/40 uppercase">
               <a href="#" className="hover:text-white transition-colors">Privacy</a>
