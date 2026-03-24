@@ -60,12 +60,12 @@ const STEP_LABELS: Record<StepKey, string> = {
 };
 
 const STEP_PROMPTS: Record<StepKey, string> = {
-  workEmail: "Where should we send the tailored demo?",
-  companyName: "Which company should this demo be built around?",
-  team: "Which team would use OVRMN first?",
-  teamSize: "How big is the team you have in mind?",
-  tools: "What tools does that team use daily?",
-  bottleneck: "What’s the biggest operational bottleneck right now?",
+  workEmail: "What's your work email?",
+  companyName: "What company are you with?",
+  team: "Which team is this for?",
+  teamSize: "How large is the team?",
+  tools: "What tools do they use?",
+  bottleneck: "Any specific bottleneck to solve?",
 };
 
 export function BookDemoFlow() {
@@ -85,12 +85,12 @@ export function BookDemoFlow() {
 
   const validateStep = useCallback((step: StepKey): string | undefined => {
     if (step === "workEmail") {
-      if (!form.workEmail.trim()) return "Use a work email to unlock the rest of the form.";
-      if (!isValidEmail(form.workEmail)) return "Enter a valid email address.";
-      if (!isWorkEmail(form.workEmail)) return "Please use your work email instead of a personal inbox.";
+      if (!form.workEmail.trim()) return "Required";
+      if (!isValidEmail(form.workEmail)) return "Invalid email";
+      if (!isWorkEmail(form.workEmail)) return "Work email required";
     }
     if (step === "companyName") {
-      if (!form.companyName.trim()) return "Tell us which company we should tailor the demo for.";
+      if (!form.companyName.trim()) return "Required";
     }
     return undefined;
   }, [form]);

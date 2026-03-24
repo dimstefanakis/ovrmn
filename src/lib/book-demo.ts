@@ -128,17 +128,17 @@ export function validateBookDemoSubmission(
   const errors: BookDemoFieldErrors = {};
 
   if (!workEmail) {
-    errors.workEmail = "Use a work email to unlock the rest of the form.";
+    errors.workEmail = "Required";
   } else if (!isValidEmail(workEmail)) {
-    errors.workEmail = "Enter a valid email address.";
+    errors.workEmail = "Invalid email";
   } else if (!isWorkEmail(workEmail)) {
-    errors.workEmail = "Please use your work email instead of a personal inbox.";
+    errors.workEmail = "Work email required";
   }
 
   if (!companyName) {
-    errors.companyName = "Tell us which company we should tailor the demo for.";
+    errors.companyName = "Required";
   } else if (companyName.length > 120) {
-    errors.companyName = "Keep the company name under 120 characters.";
+    errors.companyName = "Too long";
   }
 
   if (team && !TEAM_SET.has(team)) {
