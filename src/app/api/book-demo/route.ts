@@ -1,15 +1,17 @@
-import { createHash } from "node:crypto";
 import { cookies, headers } from "next/headers";
 import {
   type BookDemoAttribution,
   type BookDemoSubmission,
   validateBookDemoSubmission,
 } from "@/lib/book-demo";
+import {
+  getClientIpAddress,
+  sendMetaConversionEvent,
+} from "@/lib/meta-server";
 
 export const runtime = "nodejs";
 
 const AIRTABLE_API_URL = "https://api.airtable.com/v0";
-const META_GRAPH_API_VERSION = process.env.META_GRAPH_API_VERSION ?? "v23.0";
 
 export async function POST(request: Request) {
   const payload = await request.json().catch(() => null);
@@ -48,13 +50,44 @@ export async function POST(request: Request) {
 
   const [airtableResult, metaResult] = await Promise.allSettled([
     writeLeadToAirtable(validation.data, attribution, eventId),
-    sendMetaLead({
-      attribution,
-      clientIpAddress,
-      clientUserAgent,
-      eventId,
-      submission: validation.data,
-    }),
+    Promise.all([
+      sendMetaConversionEvent({
+        clientIpAddress,
+        clientUserAgent,
+        customData: {
+          company_name: validation.data.companyName,
+          content_category: "Book demo",
+          content_name: "OVRMN book demo",
+          team: validation.data.team || "",
+          team_size: validation.data.teamSize || "",
+          tools: validation.data.tools?.join(", ") || "",
+        },
+        email: validation.data.workEmail,
+        eventId,
+        eventName: "Lead",
+        eventSourceUrl: validation.data.pageUrl,
+        fbc: attribution.fbc,
+        fbp: attribution.fbp,
+      }),
+      sendMetaConversionEvent({
+        clientIpAddress,
+        clientUserAgent,
+        customData: {
+          company_name: validation.data.companyName,
+          content_category: "Book demo",
+          content_name: "OVRMN book demo completion",
+          team: validation.data.team || "",
+          team_size: validation.data.teamSize || "",
+          tools: validation.data.tools?.join(", ") || "",
+        },
+        email: validation.data.workEmail,
+        eventId,
+        eventName: "CompleteRegistration",
+        eventSourceUrl: validation.data.pageUrl,
+        fbc: attribution.fbc,
+        fbp: attribution.fbp,
+      }),
+    ]),
   ]);
 
   if (airtableResult.status === "rejected") {
@@ -79,7 +112,10 @@ export async function POST(request: Request) {
 
   return Response.json({
     ok: true,
-    metaTracked: metaResult.status === "fulfilled" ? metaResult.value : false,
+    metaTracked:
+      metaResult.status === "fulfilled"
+        ? metaResult.value.some(Boolean)
+        : false,
   });
 }
 
@@ -151,75 +187,6 @@ async function writeLeadToAirtable(
   return true;
 }
 
-async function sendMetaLead({
-  attribution,
-  clientIpAddress,
-  clientUserAgent,
-  eventId,
-  submission,
-}: {
-  attribution: BookDemoAttribution;
-  clientIpAddress?: string;
-  clientUserAgent?: string;
-  eventId: string;
-  submission: BookDemoSubmission;
-}) {
-  const pixelId = process.env.META_PIXEL_ID || process.env.NEXT_PUBLIC_META_PIXEL_ID;
-  const accessToken = process.env.META_ACCESS_TOKEN;
-
-  if (!pixelId || !accessToken) {
-    return false;
-  }
-
-  const payload = {
-    data: [
-      {
-        action_source: "website",
-        custom_data: {
-          content_category: "Book demo",
-          content_name: "OVRMN book demo",
-        },
-        event_id: eventId,
-        event_name: "Lead",
-        event_source_url: submission.pageUrl || undefined,
-        event_time: Math.floor(Date.now() / 1000),
-        user_data: compactObject({
-          client_ip_address: clientIpAddress,
-          client_user_agent: clientUserAgent,
-          em: [hashSha256(submission.workEmail)],
-          fbc: attribution.fbc,
-          fbp: attribution.fbp,
-        }),
-      },
-    ],
-    test_event_code: process.env.META_TEST_EVENT_CODE || undefined,
-  };
-
-  const response = await fetch(
-    `https://graph.facebook.com/${META_GRAPH_API_VERSION}/${pixelId}/events?access_token=${encodeURIComponent(
-      accessToken
-    )}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-      cache: "no-store",
-      signal: AbortSignal.timeout(10_000),
-    }
-  );
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(
-      `Meta returned ${response.status}: ${errorBody || "Unknown error"}`
-    );
-  }
-
-  return true;
-}
-
 function mergeAttribution(
   submission: BookDemoSubmission,
   cookieStore: Awaited<ReturnType<typeof cookies>>
@@ -260,16 +227,6 @@ function mergeAttribution(
   });
 }
 
-function getClientIpAddress(requestHeaders: Awaited<ReturnType<typeof headers>>) {
-  const forwardedFor = requestHeaders.get("x-forwarded-for");
-
-  if (forwardedFor) {
-    return forwardedFor.split(",")[0]?.trim();
-  }
-
-  return requestHeaders.get("x-real-ip") || undefined;
-}
-
 function getMissingAirtableConfig() {
   return [
     !process.env.AIRTABLE_API_KEY && "AIRTABLE_API_KEY",
@@ -308,10 +265,6 @@ function firstError(errors: Record<string, string | undefined>) {
 
 function createServerEventId() {
   return `ovrmn_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-}
-
-function hashSha256(value: string) {
-  return createHash("sha256").update(value.trim().toLowerCase()).digest("hex");
 }
 
 function formatFbc(fbclid?: string) {

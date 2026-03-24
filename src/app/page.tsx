@@ -1,6 +1,8 @@
-import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, ChevronRight } from "lucide-react";
+import { MetaTrackedAnchor } from "@/components/meta-tracked-anchor";
+import { MetaTrackedLink } from "@/components/meta-tracked-link";
+import { MetaViewContent } from "@/components/meta-view-content";
 
 export default function Home() {
   const bgPath = "/bg.webp";
@@ -8,6 +10,10 @@ export default function Home() {
 
   return (
     <main className="relative flex min-h-screen flex-col bg-black overflow-hidden selection:bg-white selection:text-black">
+      <MetaViewContent
+        contentCategory="Landing page"
+        contentName="OVRMN homepage"
+      />
       {/* Navigation Header - Monastic Minimal */}
       <nav className="fixed top-0 z-40 flex w-full items-center justify-between border-b border-white/[0.05] bg-black/20 px-6 py-6 md:px-12 backdrop-blur-md">
         <div className="flex items-center gap-3">
@@ -19,13 +25,18 @@ export default function Home() {
           <a href="#capabilities" className="hover:text-white transition-colors">Capabilities</a>
           <a href="#teams" className="hover:text-white transition-colors">Teams</a>
         </div>
-        <Link
+        <MetaTrackedLink
           className="group flex items-center gap-2 border border-white/20 px-5 py-2 font-mono text-[10px] tracking-wider uppercase transition-all hover:bg-white hover:text-black"
+          customData={{
+            content_category: "Navigation",
+            content_name: "Book a demo",
+          }}
+          eventName="InitiateCheckout"
           href="/book"
         >
           Book a Demo
           <ArrowUpRight className="h-3 w-3" />
-        </Link>
+        </MetaTrackedLink>
       </nav>
 
       {/* SECTION 1 — HERO SECTION — THE ECLIPSE */}
@@ -60,12 +71,17 @@ export default function Home() {
           </p>
 
           <div className="reveal-up mt-10 flex flex-col items-start gap-6 sm:flex-row" style={{ animationDelay: "700ms" }}>
-            <Link
+            <MetaTrackedLink
               className="inline-flex h-16 min-w-[240px] items-center justify-center border border-white bg-white px-8 font-mono text-[10px] tracking-[0.15em] uppercase text-black transition-all hover:bg-transparent hover:text-white"
+              customData={{
+                content_category: "Hero",
+                content_name: "Book a demo",
+              }}
+              eventName="InitiateCheckout"
               href="/book"
             >
               Book a Demo
-            </Link>
+            </MetaTrackedLink>
             <button className="flex h-16 items-center gap-4 px-8 font-mono text-[10px] tracking-[0.15em] uppercase text-white/60 transition-all hover:text-white">
               See How It Works
               <ChevronRight className="h-4 w-4" />
@@ -244,12 +260,17 @@ export default function Home() {
           </h2>
 
           <div className="mt-24">
-            <Link
+            <MetaTrackedLink
               className="inline-flex h-20 min-w-[320px] items-center justify-center bg-white px-12 font-mono text-xs tracking-[0.2em] uppercase text-black hover:bg-neutral-200 transition-all"
+              customData={{
+                content_category: "Closing CTA",
+                content_name: "Book a demo",
+              }}
+              eventName="InitiateCheckout"
               href="/book"
             >
               Book a Demo
-            </Link>
+            </MetaTrackedLink>
           </div>
         </div>
       </section>
@@ -272,7 +293,19 @@ export default function Home() {
               <div className="space-y-10">
                 <h5 className="font-mono text-[10px] tracking-[0.2em] uppercase text-white/80">Connect</h5>
                 <ul className="space-y-6 font-mono text-[10px] tracking-[0.15em] text-white/50 uppercase">
-                  <li><a href="mailto:lab@ovrmn.ai" className="hover:text-white transition-colors">lab@ovrmn.ai</a></li>
+                  <li>
+                    <MetaTrackedAnchor
+                      className="hover:text-white transition-colors"
+                      customData={{
+                        content_category: "Footer",
+                        content_name: "Direct email",
+                      }}
+                      eventName="Contact"
+                      href="mailto:lab@ovrmn.ai"
+                    >
+                      lab@ovrmn.ai
+                    </MetaTrackedAnchor>
+                  </li>
                   <li><a href="#" className="hover:text-white transition-colors">LinkedIn</a></li>
                   <li><a href="#" className="hover:text-white transition-colors">X / Twitter</a></li>
                 </ul>

@@ -1,3 +1,4 @@
+import type { MetaEventPayload, MetaEventName } from "@/lib/meta-events";
 import type { BookDemoAttribution } from "@/lib/book-demo";
 
 declare global {
@@ -7,7 +8,8 @@ declare global {
   }
 }
 
-const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+const META_PIXEL_ID =
+  process.env.NEXT_PUBLIC_META_PIXEL_ID || "933312889573075";
 const ATTRIBUTION_COOKIE_DAYS = 90;
 
 const UTM_KEYS = [
@@ -24,6 +26,14 @@ export function hasMetaPixel() {
 
 export function getMetaPixelId() {
   return META_PIXEL_ID;
+}
+
+export function createMetaEventId(prefix = "meta_event") {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return `${prefix}_${crypto.randomUUID()}`;
+  }
+
+  return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 }
 
 export function rememberAttributionFromBrowser() {
@@ -112,14 +122,8 @@ export function trackMetaLead(
     tools?: string[];
   }
 ) {
-  if (typeof window === "undefined" || typeof window.fbq !== "function") {
-    return;
-  }
-
-  window.fbq(
-    "track",
-    "Lead",
-    {
+  trackMetaBrowserEvent({
+    customData: {
       content_category: "Book demo",
       content_name: "OVRMN book demo",
       team: payload.team || "",
@@ -127,8 +131,125 @@ export function trackMetaLead(
       tools: payload.tools?.join(", ") || "",
       company_name: payload.companyName,
     },
+    eventId,
+    eventName: "Lead",
+  });
+}
+
+export function trackMetaCompleteRegistration(
+  eventId: string,
+  payload: {
+    companyName: string;
+    email: string;
+    team?: string;
+    teamSize?: string;
+    tools?: string[];
+  }
+) {
+  trackMetaBrowserEvent({
+    customData: {
+      company_name: payload.companyName,
+      content_category: "Book demo",
+      content_name: "OVRMN book demo completion",
+      email_domain: payload.email.split("@")[1] || "",
+      team: payload.team || "",
+      team_size: payload.teamSize || "",
+      tools: payload.tools?.join(", ") || "",
+    },
+    eventId,
+    eventName: "CompleteRegistration",
+  });
+}
+
+export function trackMetaEvent(payload: MetaEventPayload) {
+  const eventId = payload.eventId || createMetaEventId(payload.eventName.toLowerCase());
+
+  trackMetaBrowserEvent({
+    ...payload,
+    eventId,
+  });
+
+  void sendMetaServerEvent({
+    ...payload,
+    eventId,
+  });
+
+  return eventId;
+}
+
+export function trackMetaSearch(searchString: string, customData?: Record<string, unknown>) {
+  return trackMetaEvent({
+    customData: {
+      ...customData,
+      search_string: searchString,
+    },
+    eventName: "Search",
+  });
+}
+
+function trackMetaBrowserEvent({
+  attempt = 0,
+  customData,
+  eventId,
+  eventName,
+}: {
+  attempt?: number;
+  customData?: Record<string, unknown>;
+  eventId: string;
+  eventName: MetaEventName;
+}) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  if (typeof window.fbq !== "function") {
+    if (attempt >= 8) {
+      return;
+    }
+
+    window.setTimeout(() => {
+      trackMetaBrowserEvent({
+        attempt: attempt + 1,
+        customData,
+        eventId,
+        eventName,
+      });
+    }, 250);
+    return;
+  }
+
+  window.fbq(
+    "track",
+    eventName,
+    customData || {},
     { eventID: eventId }
   );
+}
+
+function sendMetaServerEvent(payload: MetaEventPayload & { eventId: string }) {
+  if (typeof window === "undefined") {
+    return Promise.resolve(false);
+  }
+
+  const body = JSON.stringify({
+    ...payload,
+    attribution: collectBookDemoAttribution(),
+    eventSourceUrl: payload.eventSourceUrl || window.location.href,
+  });
+
+  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
+    const blob = new Blob([body], { type: "application/json" });
+    return Promise.resolve(navigator.sendBeacon("/api/meta/events", blob));
+  }
+
+  return fetch("/api/meta/events", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body,
+    keepalive: true,
+  }).then((response) => response.ok);
 }
 
 function parseJson<T>(value: string | null): T | null {
