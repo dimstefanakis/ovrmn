@@ -26,6 +26,7 @@ export type BookDemoAttribution = {
   fbc?: string;
   fbp?: string;
   fbclid?: string;
+  liFatId?: string;
   landingPath?: string;
   referrer?: string;
   utmCampaign?: string;
@@ -192,6 +193,7 @@ function normalizeAttribution(value: unknown): BookDemoAttribution | undefined {
     fbc: trimmed(candidate.fbc),
     fbp: trimmed(candidate.fbp),
     fbclid: trimmed(candidate.fbclid),
+    liFatId: trimmed(candidate.liFatId),
     landingPath: trimmed(candidate.landingPath),
     referrer: trimmed(candidate.referrer),
     utmCampaign: trimmed(candidate.utmCampaign),

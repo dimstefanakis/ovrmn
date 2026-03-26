@@ -43,6 +43,7 @@ export function rememberAttributionFromBrowser() {
 
   const url = new URL(window.location.href);
   const fbclid = url.searchParams.get("fbclid");
+  const liFatId = url.searchParams.get("li_fat_id")?.trim();
 
   if (fbclid) {
     const existingFbc = readCookie("_fbc") ?? readCookie("ovrmn_fbc");
@@ -54,6 +55,10 @@ export function rememberAttributionFromBrowser() {
   const fbp = readCookie("_fbp");
   if (fbp) {
     writeCookie("ovrmn_fbp", fbp, ATTRIBUTION_COOKIE_DAYS);
+  }
+
+  if (liFatId) {
+    writeCookie("ovrmn_li_fat_id", liFatId, ATTRIBUTION_COOKIE_DAYS);
   }
 
   const utmValues = Object.fromEntries(
@@ -96,6 +101,11 @@ export function collectBookDemoAttribution(): BookDemoAttribution {
     fbc: readCookie("_fbc") ?? readCookie("ovrmn_fbc") ?? undefined,
     fbp: readCookie("_fbp") ?? readCookie("ovrmn_fbp") ?? undefined,
     fbclid: url.searchParams.get("fbclid") ?? readCookie("ovrmn_fbclid") ?? undefined,
+    liFatId:
+      url.searchParams.get("li_fat_id") ??
+      readCookie("ovrmn_li_fat_id") ??
+      readCookie("li_fat_id") ??
+      undefined,
     landingPath:
       readCookie("ovrmn_landing_path") ?? `${url.pathname}${url.search}`,
     referrer: document.referrer || readCookie("ovrmn_referrer") || undefined,
