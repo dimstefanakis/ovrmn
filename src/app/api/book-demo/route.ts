@@ -8,6 +8,7 @@ import {
   getClientIpAddress,
   sendMetaConversionEvent,
 } from "@/lib/meta-server";
+import { sendLinkedInConversionEvent } from "@/lib/linkedin-server";
 
 export const runtime = "nodejs";
 
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
   const clientUserAgent = requestHeaders.get("user-agent") || undefined;
   const eventId = validation.data.eventId || createServerEventId();
 
-  const [airtableResult, metaResult] = await Promise.allSettled([
+  const [airtableResult, analyticsResult] = await Promise.allSettled([
     writeLeadToAirtable(validation.data, attribution, eventId),
     Promise.all([
       sendMetaConversionEvent({
@@ -87,14 +88,19 @@ export async function POST(request: Request) {
         fbc: attribution.fbc,
         fbp: attribution.fbp,
       }),
+      sendLinkedInConversionEvent({
+        email: validation.data.workEmail,
+        eventId,
+        liFatId: attribution.liFatId,
+      }),
     ]),
   ]);
 
   if (airtableResult.status === "rejected") {
     console.error("Airtable lead write failed", airtableResult.reason);
 
-    if (metaResult.status === "rejected") {
-      console.error("Meta lead tracking also failed", metaResult.reason);
+    if (analyticsResult.status === "rejected") {
+      console.error("Analytics tracking also failed", analyticsResult.reason);
     }
 
     return Response.json(
@@ -106,16 +112,19 @@ export async function POST(request: Request) {
     );
   }
 
-  if (metaResult.status === "rejected") {
-    console.error("Meta lead tracking failed", metaResult.reason);
+  if (analyticsResult.status === "rejected") {
+    console.error("Analytics tracking failed", analyticsResult.reason);
   }
+
+  const [leadTracked, registrationTracked, linkedInTracked] =
+    analyticsResult.status === "fulfilled"
+      ? analyticsResult.value
+      : [false, false, false];
 
   return Response.json({
     ok: true,
-    metaTracked:
-      metaResult.status === "fulfilled"
-        ? metaResult.value.some(Boolean)
-        : false,
+    linkedInTracked,
+    metaTracked: leadTracked || registrationTracked,
   });
 }
 
@@ -208,6 +217,10 @@ function mergeAttribution(
       cookieStore.get("_fbp")?.value ||
       cookieStore.get("ovrmn_fbp")?.value,
     fbclid: submission.attribution?.fbclid || cookieFbclid,
+    liFatId:
+      submission.attribution?.liFatId ||
+      cookieStore.get("ovrmn_li_fat_id")?.value ||
+      cookieStore.get("li_fat_id")?.value,
     landingPath:
       submission.attribution?.landingPath ||
       cookieStore.get("ovrmn_landing_path")?.value,
