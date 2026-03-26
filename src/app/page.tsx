@@ -301,9 +301,9 @@ export default function Home() {
                         content_name: "Direct email",
                       }}
                       eventName="Contact"
-                      href="mailto:lab@ovrmn.ai"
+                      href="mailto:admin@senec.ai"
                     >
-                      lab@ovrmn.ai
+                      admin@senec.ai
                     </MetaTrackedAnchor>
                   </li>
                   <li><a href="#" className="hover:text-white transition-colors">LinkedIn</a></li>
