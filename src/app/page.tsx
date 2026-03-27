@@ -48,6 +48,7 @@ export default function Home() {
             alt="Intelligence Observatory" 
             fill 
             priority
+            sizes="100vw"
             className="object-cover grayscale contrast-110 opacity-80"
           />
           {/* Subtle gradient to ensure left-side text legibility */}
@@ -82,10 +83,13 @@ export default function Home() {
             >
               Book a Demo
             </MetaTrackedLink>
-            <button className="flex h-16 items-center gap-4 px-8 font-mono text-[10px] tracking-[0.15em] uppercase text-white/60 transition-all hover:text-white">
+            <a
+              className="flex h-16 items-center gap-4 px-8 font-mono text-[10px] tracking-[0.15em] uppercase text-white/60 transition-all hover:text-white"
+              href="#how-it-works"
+            >
               See How It Works
               <ChevronRight className="h-4 w-4" />
-            </button>
+            </a>
           </div>
         </div>
 
@@ -108,6 +112,7 @@ export default function Home() {
                   src={portraitPath} 
                   alt="Portrait of Sovereignty" 
                   fill 
+                  sizes="(min-width: 1024px) 40vw, 100vw"
                   className="object-cover grayscale contrast-125"
                 />
                 <div className="absolute inset-0 dither-bg opacity-40 pointer-events-none" />
@@ -306,8 +311,6 @@ export default function Home() {
                       admin@senec.ai
                     </MetaTrackedAnchor>
                   </li>
-                  <li><a href="#" className="hover:text-white transition-colors">LinkedIn</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">X / Twitter</a></li>
                 </ul>
               </div>
               <div className="space-y-10">
@@ -324,11 +327,6 @@ export default function Home() {
           <div className="mt-48 flex flex-col items-center justify-between border-t border-white/[0.05] pt-16 md:flex-row">
             <div className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase mb-12 md:mb-0">
               OVRMN // AI TEAMMATES // 2026
-            </div>
-            <div className="flex gap-16 font-mono text-[10px] tracking-[0.15em] text-white/40 uppercase">
-              <a href="#" className="hover:text-white transition-colors">Privacy</a>
-              <a href="#" className="hover:text-white transition-colors">Ethics</a>
-              <a href="#" className="hover:text-white transition-colors">Terms</a>
             </div>
           </div>
         </div>
