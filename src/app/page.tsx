@@ -62,7 +62,7 @@ export default function Home() {
             <span>Stop paying experts to do a machine&apos;s job</span>
           </div>
 
-          <h1 className="reveal-up mt-6 font-serif text-4xl leading-[1.1] md:text-6xl lg:text-7xl xl:text-[5.5rem] tracking-tight" style={{ animationDelay: "300ms" }}>
+          <h1 className="reveal-up mt-6 font-serif text-4xl leading-[1.1] md:text-5xl lg:text-6xl xl:text-7xl tracking-tight" style={{ animationDelay: "300ms" }}>
             You already wrote the playbook. <br />
             <span className="italic font-light opacity-80">It&apos;s just stuck in Slack.</span>
           </h1>
