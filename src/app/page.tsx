@@ -59,7 +59,7 @@ export default function Home() {
         <div className="relative z-10 max-w-3xl">
           <div className="reveal-up flex items-center gap-4 font-mono text-[10px] tracking-[0.2em] uppercase text-white/70" style={{ animationDelay: "100ms" }}>
             <div className="h-2 w-2 bg-white" />
-            <span>Stop paying experts to do a machine&apos;s job</span>
+            <span>Your knowledge is there. It&apos;s just scattered.</span>
           </div>
 
           <h1 className="reveal-up mt-6 font-serif text-4xl leading-[1.1] md:text-5xl lg:text-6xl xl:text-7xl tracking-tight" style={{ animationDelay: "300ms" }}>
@@ -235,7 +235,7 @@ export default function Home() {
             {[
               { date: "Engineering", title: "Your Monday standup question, answered before standup. Rollout broke something? Flagged. Task needs logging? Done. No SQL required." },
               { date: "Marketing", title: "The Monday morning report is already built. Budget anomaly flagged before anyone asks. The ops brain that runs while your team sleeps." },
-              { date: "Support", title: "Tier-1 tickets resolved before your team clocks in. Pattern across 100 complaints? Already handled." }
+              { date: "Support", title: "Resolve tier-1 tickets across every channel. First-response time drops from hours to seconds." }
             ].map((note, i) => (
               <div key={i} className="group bg-black p-16 transition-colors hover:bg-white/[0.02] cursor-pointer">
                 <span className="font-mono text-[10px] tracking-widest text-white/30 uppercase mb-8 block">{note.date}</span>
