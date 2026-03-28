@@ -34,7 +34,7 @@ export default function Home() {
           eventName="InitiateCheckout"
           href="/book"
         >
-          Book a Demo
+          Get Free Pilot
           <ArrowUpRight className="h-3 w-3" />
         </MetaTrackedLink>
       </nav>
@@ -59,37 +59,42 @@ export default function Home() {
         <div className="relative z-10 max-w-3xl">
           <div className="reveal-up flex items-center gap-4 font-mono text-[10px] tracking-[0.2em] uppercase text-white/70" style={{ animationDelay: "100ms" }}>
             <div className="h-2 w-2 bg-white" />
-            <span>AI Teammates for Every Team</span>
+            <span>Stop paying experts to do a machine&apos;s job</span>
           </div>
 
-          <h1 className="reveal-up mt-6 font-serif text-4xl leading-[1.1] md:text-6xl lg:text-7xl xl:text-8xl tracking-tight" style={{ animationDelay: "300ms" }}>
-            Teammates that <br />
-            <span className="italic font-light opacity-80">know the playbook.</span>
+          <h1 className="reveal-up mt-6 font-serif text-4xl leading-[1.1] md:text-6xl lg:text-7xl xl:text-[5.5rem] tracking-tight" style={{ animationDelay: "300ms" }}>
+            You already wrote the playbook. <br />
+            <span className="italic font-light opacity-80">It&apos;s just stuck in Slack.</span>
           </h1>
 
           <p className="reveal-up mt-6 max-w-xl text-lg font-light leading-relaxed text-white/80 md:text-xl" style={{ animationDelay: "500ms" }}>
-            ovrmn deploys AI agents that learn how your team works, plug into the tools you already use, and handle real tasks — from triaging tickets to monitoring rollouts to scheduling reports.
+            You&apos;re paying expert rates for routine work. Not because it&apos;s hard, but because only your people know where to look. ovrmn learns that map, drops into Slack, and starts moving the work.
           </p>
 
           <div className="reveal-up mt-10 flex flex-col items-start gap-6 sm:flex-row" style={{ animationDelay: "700ms" }}>
-            <MetaTrackedLink
-              className="inline-flex h-16 min-w-[240px] items-center justify-center border border-white bg-white px-8 font-mono text-[10px] tracking-[0.15em] uppercase text-black transition-all hover:bg-transparent hover:text-white"
-              customData={{
-                content_category: "Hero",
-                content_name: "Book a demo",
-              }}
-              eventName="InitiateCheckout"
-              href="/book"
-            >
-              Book a Demo
-            </MetaTrackedLink>
-            <a
-              className="flex h-16 items-center gap-4 px-8 font-mono text-[10px] tracking-[0.15em] uppercase text-white/60 transition-all hover:text-white"
-              href="#how-it-works"
-            >
-              See How It Works
-              <ChevronRight className="h-4 w-4" />
-            </a>
+            <div className="flex flex-col items-start gap-3">
+              <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
+                <MetaTrackedLink
+                  className="inline-flex h-16 min-w-[240px] items-center justify-center border border-white bg-white px-8 font-mono text-[10px] tracking-[0.15em] uppercase text-black transition-all hover:bg-transparent hover:text-white"
+                  customData={{
+                    content_category: "Hero",
+                    content_name: "Book a demo",
+                  }}
+                  eventName="InitiateCheckout"
+                  href="/book"
+                >
+                  Get Your Free Pilot
+                </MetaTrackedLink>
+                <a
+                  className="hidden sm:flex h-16 items-center gap-4 px-8 font-mono text-[10px] tracking-[0.15em] uppercase text-white/60 transition-all hover:text-white"
+                  href="#how-it-works"
+                >
+                  See How It Works
+                  <ChevronRight className="h-4 w-4" />
+                </a>
+              </div>
+              <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-white/30">Built on your data. Pay only if it works.</span>
+            </div>
           </div>
         </div>
 
@@ -131,10 +136,10 @@ export default function Home() {
               </h2>
               <div className="space-y-8 max-w-xl">
                 <p className="text-xl font-light leading-relaxed text-white/70 md:text-2xl">
-                  Other platforms give you a chatbot. ovrmn gives you agents that internalize your processes, learn from every interaction, and operate inside your existing stack — not beside it.
+                  Your ops lead doesn&apos;t spend their day doing hard things. They spend it doing easy things that require knowing where everything is. Which ticket goes where. What the process is. Who to loop in.
                 </p>
                 <p className="text-xl font-light leading-relaxed text-white/70 md:text-2xl">
-                  They log tasks, query your data, flag anomalies, and handle requests — with the institutional memory of your best operator, available to every team.
+                  ovrmn learns that map, drops into Slack, and picks up the load. Your people stop being expensive routers and start being the operators you hired them to be.
                 </p>
               </div>
             </div>
@@ -147,26 +152,26 @@ export default function Home() {
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col items-start gap-12 border-b border-white/[0.1] pb-24 text-center w-full lg:text-left">
             <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/50">Capabilities</span>
-            <h2 className="font-serif text-5xl leading-tight md:text-8xl">What ovrmn Deploys</h2>
+            <h2 className="font-serif text-5xl leading-tight md:text-8xl">What it actually does</h2>
           </div>
 
           <div className="mt-32 grid gap-24 md:grid-cols-2">
             {[
               {
-                title: "Continuous Learning",
-                desc: "Every interaction teaches the agent. Your team's workflows, terminology, and edge cases become institutional memory that scales and never goes stale."
+                title: "Remembers Everything",
+                desc: "Corrected once, remembered forever. Every ticket, every shortcut, every edge case your team handles. The agent absorbs it and never forgets."
               },
               {
                 title: "Works Where You Work",
-                desc: "Slack, email, dashboards, or custom platforms. Agents operate inside the tools your team already uses — no new interfaces to learn."
+                desc: "It lives in Slack. Your team doesn't learn a new tool. They just talk to one that actually does things."
               },
               {
-                title: "Deep Integrations",
-                desc: "Proprietary connectors to your project tracker, CRM, data warehouse, and internal tools. Agents act on real data — not just surface-level answers."
+                title: "Pulls Real Data",
+                desc: "Connected to your project tracker, CRM, data warehouse. The agent reads, writes, and acts on live data. Not cached summaries."
               },
               {
                 title: "Teammate, Not Tool",
-                desc: "Agents triage tickets, log tasks, pull reports, and flag anomalies. They escalate to humans with full context. They work with your team, not around it."
+                desc: "It doesn't wait to be asked. It triages, logs, reports, and escalates. Then tells you what it did and why."
               }
             ].map((sys, i) => (
               <div key={i} className="group border-l border-white/10 pl-12 space-y-8 transition-colors hover:border-white">
@@ -180,7 +185,7 @@ export default function Home() {
       </section>
 
       {/* THE PROCESS — THE METHOD OF REFINEMENT — THE FOREST */}
-      <section className="relative w-full h-[70vh] min-h-[600px] max-h-[850px] flex items-center px-6 md:px-12 bg-black border-t border-white/[0.05] overflow-hidden">
+      <section className="relative w-full min-h-[700px] md:h-[70vh] md:min-h-[600px] md:max-h-[850px] flex items-center py-32 md:py-0 px-6 md:px-12 bg-black border-t border-white/[0.05] overflow-hidden">
         <div className="absolute inset-0 z-0 w-full h-full opacity-80">
           <Image 
             src="/forest.webp" 
@@ -196,14 +201,14 @@ export default function Home() {
 
         <div className="relative z-10 mx-auto w-full max-w-7xl">
           <div className="max-w-4xl">
-            <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/60" id="how-it-works">The Process</span>
+            <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/60" id="how-it-works">How It Works</span>
             <h2 className="mt-8 font-serif text-5xl leading-tight md:text-7xl">Live in one week. <br /><span className="italic font-light opacity-80">Learning forever.</span></h2>
 
             <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-12">
               {[
-                { title: "Connect", body: "We plug into your existing systems — Slack, Asana, your data warehouse, CRM, helpdesk. No migration, no setup workshops." },
-                { title: "Learn", body: "The agent ingests your team's historical data, docs, and processes to build operational memory from day one." },
-                { title: "Deploy", body: "Go live across your channels. The agent handles real tasks, escalates when uncertain, and operates transparently." }
+                { title: "Discovery", body: "We read your tickets, docs, and Slack threads. Everything your team already wrote down. Unstructured knowledge becomes structured operational memory." },
+                { title: "Automation", body: "The agent drops into Slack and starts moving work. Triaging, routing, reporting, flagging. The same things your team does, without the bottleneck." },
+                { title: "Learning", body: "Every correction sharpens it. Every new ticket teaches it. The agent gets better because it's in the middle of the work, not watching from the side." }
               ].map((step, i) => (
                 <div key={i} className="flex flex-col gap-4 border-l border-white/10 pl-6">
                   <span className="font-mono text-[10px] text-white/30">{String(i + 1).padStart(2, '0')}</span>
@@ -222,15 +227,15 @@ export default function Home() {
           <div className="flex flex-col items-center justify-between gap-12 border-b border-white/[0.1] pb-16 md:flex-row">
             <div>
               <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/50">Teams</span>
-              <h2 className="mt-6 font-serif text-4xl md:text-6xl italic font-light">Works across teams. Any size.</h2>
+              <h2 className="mt-6 font-serif text-4xl md:text-6xl italic font-light">Put it to work.</h2>
             </div>
           </div>
 
           <div className="mt-16 grid gap-px bg-white/[0.05] md:grid-cols-3">
             {[
-              { date: "Engineering", title: "Log tasks by talking to Slack. Monitor rollouts for anomalies. Query internal data without writing SQL." },
-              { date: "Marketing", title: "Schedule reports, track campaign performance, flag underspending. An ops brain that never sleeps." },
-              { date: "Support", title: "Resolve tier-1 tickets across every channel. First-response time drops from hours to seconds." }
+              { date: "Engineering", title: "Your Monday standup question, answered before standup. Rollout broke something? Flagged. Task needs logging? Done. No SQL required." },
+              { date: "Marketing", title: "The Monday morning report is already built. Budget anomaly flagged before anyone asks. The ops brain that runs while your team sleeps." },
+              { date: "Support", title: "Tier-1 tickets resolved before your team clocks in. Pattern across 100 complaints? Already handled." }
             ].map((note, i) => (
               <div key={i} className="group bg-black p-16 transition-colors hover:bg-white/[0.02] cursor-pointer">
                 <span className="font-mono text-[10px] tracking-widest text-white/30 uppercase mb-8 block">{note.date}</span>
@@ -264,7 +269,7 @@ export default function Home() {
             <span className="italic font-light text-white/60">We make it operational.</span>
           </h2>
 
-          <div className="mt-24">
+          <div className="mt-24 flex flex-col items-center gap-6">
             <MetaTrackedLink
               className="inline-flex h-20 min-w-[320px] items-center justify-center bg-white px-12 font-mono text-xs tracking-[0.2em] uppercase text-black hover:bg-neutral-200 transition-all"
               customData={{
@@ -274,8 +279,9 @@ export default function Home() {
               eventName="InitiateCheckout"
               href="/book"
             >
-              Book a Demo
+              Get Your Free Pilot
             </MetaTrackedLink>
+            <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-white/30">We build it on your data. You only pay if it works.</span>
           </div>
         </div>
       </section>
@@ -290,7 +296,7 @@ export default function Home() {
                 <span className="font-mono text-sm font-medium tracking-[0.2em] uppercase text-white">ovrmn</span>
               </div>
               <p className="max-w-xs text-[10px] font-light leading-relaxed text-white/40 uppercase tracking-[0.15em]">
-                AI teammates that learn, integrate, and operate — across every team.
+                Your sharpest operator. Never sleeps. Never quits.
               </p>
             </div>
             
