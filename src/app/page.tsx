@@ -7,6 +7,8 @@ import { MetaViewContent } from "@/components/meta-view-content";
 export default function Home() {
   const bgPath = "/bg.webp";
   const portraitPath = "/alexander.webp";
+  const supportFlowVideoPath = "/support-flow-web.mp4";
+  const supportFlowPosterPath = "/support-flow-poster.jpg";
 
   return (
     <main className="relative flex min-h-screen flex-col bg-black overflow-hidden selection:bg-white selection:text-black">
@@ -200,22 +202,62 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-7xl">
-          <div className="max-w-4xl">
-            <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/60" id="how-it-works">How It Works</span>
-            <h2 className="mt-8 font-serif text-5xl leading-tight md:text-7xl">Live in one week. <br /><span className="italic font-light opacity-80">Learning forever.</span></h2>
+          <div className="grid gap-16 xl:grid-cols-[minmax(0,1.1fr)_minmax(360px,440px)] xl:items-start">
+            <div className="max-w-4xl">
+              <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/60" id="how-it-works">How It Works</span>
+              <h2 className="mt-8 font-serif text-5xl leading-tight md:text-7xl">Live in one week. <br /><span className="italic font-light opacity-80">Learning forever.</span></h2>
 
-            <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-12">
-              {[
-                { title: "Discovery", body: "We read your tickets, docs, and Slack threads. Everything your team already wrote down. Unstructured knowledge becomes structured operational memory." },
-                { title: "Automation", body: "The agent drops into Slack and starts moving work. Triaging, routing, reporting, flagging. The same things your team does, without the bottleneck." },
-                { title: "Learning", body: "Every correction sharpens it. Every new ticket teaches it. The agent gets better because it's in the middle of the work, not watching from the side." }
-              ].map((step, i) => (
-                <div key={i} className="flex flex-col gap-4 border-l border-white/10 pl-6">
-                  <span className="font-mono text-[10px] text-white/30">{String(i + 1).padStart(2, '0')}</span>
-                  <h4 className="font-mono text-[11px] tracking-[0.2em] uppercase text-white/80">{step.title}</h4>
-                  <p className="text-sm font-light leading-relaxed text-white/60">{step.body}</p>
+              <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-12">
+                {[
+                  { title: "Discovery", body: "We read your tickets, docs, and Slack threads. Everything your team already wrote down. Unstructured knowledge becomes structured operational memory." },
+                  { title: "Automation", body: "The agent drops into Slack and starts moving work. Triaging, routing, reporting, flagging. The same things your team does, without the bottleneck." },
+                  { title: "Learning", body: "Every correction sharpens it. Every new ticket teaches it. The agent gets better because it's in the middle of the work, not watching from the side." }
+                ].map((step, i) => (
+                  <div key={i} className="flex flex-col gap-4 border-l border-white/10 pl-6">
+                    <span className="font-mono text-[10px] text-white/30">{String(i + 1).padStart(2, '0')}</span>
+                    <h4 className="font-mono text-[11px] tracking-[0.2em] uppercase text-white/80">{step.title}</h4>
+                    <p className="text-sm font-light leading-relaxed text-white/60">{step.body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full xl:justify-self-end">
+              <div className="relative mx-auto w-full max-w-[440px]">
+                <div className="absolute inset-0 translate-x-5 translate-y-5 border border-white/[0.06] bg-black/20" />
+                <div className="relative border border-white/[0.14] bg-black/60 p-3 backdrop-blur-sm">
+                  <div className="mb-3 flex items-center justify-between border border-white/[0.08] px-3 py-2">
+                    <span className="font-mono text-[9px] tracking-[0.2em] uppercase text-white/50">
+                      Support Flow
+                    </span>
+                  </div>
+
+                  <div className="relative aspect-square overflow-hidden border border-white/[0.08] bg-black">
+                    <video
+                      aria-label="Support flow product demonstration"
+                      autoPlay
+                      className="h-full w-full object-cover"
+                      loop
+                      muted
+                      playsInline
+                      poster={supportFlowPosterPath}
+                      preload="metadata"
+                    >
+                      <source src={supportFlowVideoPath} type="video/mp4" />
+                    </video>
+
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/55 to-transparent p-4">
+                      <div className="font-mono text-[9px] tracking-[0.2em] uppercase text-white/45">
+                        Tickets • knowledge base • response • escalation
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="mt-4 max-w-sm font-mono text-[10px] leading-relaxed tracking-[0.14em] uppercase text-white/35">
+                    Real support flow. One agent reading context, replying to the customer, and escalating engineering in sequence.
+                  </p>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
