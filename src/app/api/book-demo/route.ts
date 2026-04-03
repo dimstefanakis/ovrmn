@@ -9,6 +9,7 @@ import {
   sendMetaConversionEvent,
 } from "@/lib/meta-server";
 import { sendLinkedInConversionEvent } from "@/lib/linkedin-server";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export const runtime = "nodejs";
 
@@ -114,6 +115,37 @@ export async function POST(request: Request) {
 
   if (analyticsResult.status === "rejected") {
     console.error("Analytics tracking failed", analyticsResult.reason);
+  }
+
+  const posthog = getPostHogClient();
+
+  if (posthog) {
+    try {
+      posthog.identify({
+        distinctId: validation.data.workEmail,
+        properties: {
+          email: validation.data.workEmail,
+          company: validation.data.companyName,
+          team: validation.data.team,
+          team_size: validation.data.teamSize,
+        },
+      });
+      posthog.capture({
+        distinctId: validation.data.workEmail,
+        event: "demo_lead_created",
+        properties: {
+          team: validation.data.team,
+          team_size: validation.data.teamSize,
+          tools: validation.data.tools,
+          utm_source: attribution.utmSource,
+          utm_medium: attribution.utmMedium,
+          utm_campaign: attribution.utmCampaign,
+          page_url: validation.data.pageUrl,
+        },
+      });
+    } catch (error) {
+      console.error("PostHog tracking failed", error);
+    }
   }
 
   const [leadTracked, registrationTracked, linkedInTracked] =
