@@ -20,6 +20,7 @@ import {
   trackMetaCompleteRegistration,
   trackMetaLead,
 } from "@/lib/meta-browser";
+import posthog from "posthog-js";
 
 type FormState = {
   workEmail: string;
@@ -80,6 +81,10 @@ export function BookDemoFlow() {
   const progress = ((stepIndex + 1) / STEP_ORDER.length) * 100;
 
   useEffect(() => {
+    posthog.capture("book_demo_viewed");
+  }, []);
+
+  useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [isSuccess, stepIndex]);
 
@@ -133,6 +138,12 @@ export function BookDemoFlow() {
     setIsSubmitting(true);
     setSubmitError("");
 
+    posthog.capture("book_demo_form_submitted", {
+      team: validation.data.team,
+      team_size: validation.data.teamSize,
+      tools: validation.data.tools,
+    });
+
     try {
       const response = await fetch("/api/book-demo", {
         method: "POST",
@@ -172,8 +183,23 @@ export function BookDemoFlow() {
         teamSize: validation.data.teamSize,
         tools: validation.data.tools,
       });
+      posthog.identify(validation.data.workEmail, {
+        email: validation.data.workEmail,
+        company: validation.data.companyName,
+        team: validation.data.team,
+        team_size: validation.data.teamSize,
+      });
+      posthog.capture("book_demo_submission_succeeded", {
+        team: validation.data.team,
+        team_size: validation.data.teamSize,
+        tools: validation.data.tools,
+      });
       setIsSuccess(true);
     } catch (error) {
+      posthog.captureException(error);
+      posthog.capture("book_demo_submission_failed", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       setSubmitError(
         error instanceof Error
           ? error.message
@@ -192,6 +218,10 @@ export function BookDemoFlow() {
     }
 
     if (stepIndex < STEP_ORDER.length - 1) {
+      posthog.capture("book_demo_step_advanced", {
+        from_step: currentStep,
+        from_step_index: stepIndex,
+      });
       setStepIndex((prev) => prev + 1);
     } else {
       void submitForm();
