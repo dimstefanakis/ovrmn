@@ -42,23 +42,22 @@ export default function Home() {
       </nav>
 
       {/* SECTION 1 — HERO SECTION — THE ECLIPSE */}
-      <section className="relative flex h-screen min-h-[700px] max-h-[900px] flex-col justify-center px-6 md:px-12 overflow-hidden">
+      <section className="relative flex h-screen min-h-[700px] max-h-[900px] flex-col items-center justify-center px-6 md:px-12 overflow-hidden text-center">
         {/* Background Artifacts — Increased visibility */}
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-          <Image 
-            src={bgPath} 
-            alt="Intelligence Observatory" 
-            fill 
+          <Image
+            src={bgPath}
+            alt="Intelligence Observatory"
+            fill
             priority
             sizes="100vw"
             className="object-cover grayscale contrast-110 opacity-80"
           />
-          {/* Subtle gradient to ensure left-side text legibility */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-black/30" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40" />
         </div>
 
-        <div className="relative z-10 max-w-3xl">
+        <div className="relative z-10 flex flex-col items-center">
           <div className="reveal-up flex items-center gap-4 font-mono text-[10px] tracking-[0.2em] uppercase text-white/70" style={{ animationDelay: "100ms" }}>
             <div className="h-2 w-2 bg-white" />
             <span>Your operations, automated</span>
@@ -70,12 +69,12 @@ export default function Home() {
           </h1>
 
           <p className="reveal-up mt-6 max-w-xl text-lg font-light leading-relaxed text-white/80 md:text-xl" style={{ animationDelay: "500ms" }}>
-            ovrmn is only as good as the knowledge behind it. It turns data you already have — tickets, docs, Slack threads — into operational intelligence it can act on.
+            ovrmn is only as good as the knowledge behind it. It turns data you already have, tickets, docs, conversations, into operational intelligence it can act on.
           </p>
 
-          <div className="reveal-up mt-10 flex flex-col items-start gap-6 sm:flex-row" style={{ animationDelay: "700ms" }}>
-            <div className="flex flex-col items-start gap-3">
-              <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
+          <div className="reveal-up mt-10 flex flex-col items-center gap-6 sm:flex-row" style={{ animationDelay: "700ms" }}>
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
                 <MetaTrackedLink
                   className="inline-flex h-16 min-w-[240px] items-center justify-center border border-white bg-white px-8 font-mono text-[10px] tracking-[0.15em] uppercase text-black transition-all hover:bg-transparent hover:text-white"
                   customData={{
@@ -100,12 +99,12 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Abstract Metadata — Above the fold detail */}
-        <div className="reveal-up absolute bottom-12 right-6 md:right-12 text-right" style={{ animationDelay: "900ms" }}>
+        {/* Abstract Metadata */}
+        <div className="reveal-up absolute bottom-12 left-1/2 -translate-x-1/2 text-center" style={{ animationDelay: "900ms" }}>
           <div className="font-mono text-[9px] tracking-[0.2em] text-white/40 uppercase mb-2">
-            Slack / Email / Chat / Custom
+            Email / Chat / Slack / Custom
           </div>
-          <div className="h-px w-32 bg-white/20 ml-auto" />
+          <div className="h-px w-32 bg-white/20 mx-auto" />
         </div>
       </section>
 
@@ -138,10 +137,10 @@ export default function Home() {
               </h2>
               <div className="space-y-8 max-w-xl">
                 <p className="text-xl font-light leading-relaxed text-white/70 md:text-2xl">
-                  Every business runs on knowledge that lives in people&apos;s heads — which ticket goes where, what the process is, who to loop in. ovrmn extracts that knowledge and turns it into automation.
+                  Every business runs on knowledge that lives in people&apos;s heads. Which ticket goes where. What the process is. Who to loop in. ovrmn extracts that knowledge and turns it into automation.
                 </p>
                 <p className="text-xl font-light leading-relaxed text-white/70 md:text-2xl">
-                  It drops into Slack and picks up the load. Your people stop being expensive routers and start being the operators you hired them to be.
+                  It shows up where your team works and picks up the load. Your people stop being expensive routers and start being the operators you hired them to be.
                 </p>
               </div>
             </div>
@@ -165,7 +164,7 @@ export default function Home() {
               },
               {
                 title: "Works Where You Work",
-                desc: "It lives in Slack. Your team doesn't learn a new tool. They just talk to one that actually does things."
+                desc: "It lives where your team already works. No new tool to learn. They just talk to one that actually does things."
               },
               {
                 title: "Pulls Real Data",
@@ -209,8 +208,8 @@ export default function Home() {
 
               <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-12">
                 {[
-                  { title: "Discovery", body: "We read your tickets, docs, and Slack threads. Everything your team already wrote down. Unstructured knowledge becomes structured operational memory." },
-                  { title: "Automation", body: "The agent drops into Slack and starts moving work. Triaging, routing, reporting, flagging. The same things your team does, without the bottleneck." },
+                  { title: "Discovery", body: "We read your tickets, docs, and conversations. Everything your team already wrote down. Unstructured knowledge becomes structured operational memory." },
+                  { title: "Automation", body: "The agent shows up where your team works and starts moving things. Triaging, routing, reporting, flagging. The same things your team does, without the bottleneck." },
                   { title: "Learning", body: "Every correction sharpens it. Every new ticket teaches it. The agent gets better because it's in the middle of the work, not watching from the side." }
                 ].map((step, i) => (
                   <div key={i} className="flex flex-col gap-4 border-l border-white/10 pl-6">
