@@ -61,16 +61,16 @@ export default function Home() {
         <div className="relative z-10 max-w-3xl">
           <div className="reveal-up flex items-center gap-4 font-mono text-[10px] tracking-[0.2em] uppercase text-white/70" style={{ animationDelay: "100ms" }}>
             <div className="h-2 w-2 bg-white" />
-            <span>Your knowledge is there. It&apos;s just scattered.</span>
+            <span>Your operations, automated</span>
           </div>
 
           <h1 className="reveal-up mt-6 font-serif text-4xl leading-[1.1] md:text-5xl lg:text-6xl xl:text-7xl tracking-tight" style={{ animationDelay: "300ms" }}>
-            You already wrote the playbook. <br />
-            <span className="italic font-light opacity-80">It&apos;s just stuck in Slack.</span>
+            ovrmn learns how you operate. <br />
+            <span className="italic font-light opacity-80">Then does the work.</span>
           </h1>
 
           <p className="reveal-up mt-6 max-w-xl text-lg font-light leading-relaxed text-white/80 md:text-xl" style={{ animationDelay: "500ms" }}>
-            You&apos;re paying expert rates for routine work. Not because it&apos;s hard, but because only your people know where to look. ovrmn learns that map, drops into Slack, and starts moving the work.
+            ovrmn is only as good as the knowledge behind it. It turns data you already have — tickets, docs, Slack threads — into operational intelligence it can act on.
           </p>
 
           <div className="reveal-up mt-10 flex flex-col items-start gap-6 sm:flex-row" style={{ animationDelay: "700ms" }}>
@@ -133,15 +133,15 @@ export default function Home() {
             <div className="space-y-12 order-1 lg:order-2">
               <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/50">Thesis</span>
               <h2 className="font-serif text-4xl leading-tight md:text-7xl">
-                Most AI answers questions. <br />
-                <span className="italic font-light">Ours joins the team.</span>
+                Your team already knows how. <br />
+                <span className="italic font-light">ovrmn makes it repeatable.</span>
               </h2>
               <div className="space-y-8 max-w-xl">
                 <p className="text-xl font-light leading-relaxed text-white/70 md:text-2xl">
-                  Your ops lead doesn&apos;t spend their day doing hard things. They spend it doing easy things that require knowing where everything is. Which ticket goes where. What the process is. Who to loop in.
+                  Every business runs on knowledge that lives in people&apos;s heads — which ticket goes where, what the process is, who to loop in. ovrmn extracts that knowledge and turns it into automation.
                 </p>
                 <p className="text-xl font-light leading-relaxed text-white/70 md:text-2xl">
-                  ovrmn learns that map, drops into Slack, and picks up the load. Your people stop being expensive routers and start being the operators you hired them to be.
+                  It drops into Slack and picks up the load. Your people stop being expensive routers and start being the operators you hired them to be.
                 </p>
               </div>
             </div>
@@ -307,8 +307,8 @@ export default function Home() {
           <div className="h-24 w-[1px] bg-white/20 mb-16" />
           
           <h2 className="max-w-5xl font-serif text-6xl leading-tight md:text-8xl">
-            Knowledge is the moat. <br />
-            <span className="italic font-light text-white/60">We make it operational.</span>
+            You built the knowledge. <br />
+            <span className="italic font-light text-white/60">ovrmn puts it to work.</span>
           </h2>
 
           <div className="mt-24 flex flex-col items-center gap-6">
