@@ -17,28 +17,30 @@ export default function Home() {
         contentName="OVRMN homepage"
       />
       {/* Navigation Header - Monastic Minimal */}
-      <nav className="fixed top-0 z-40 flex w-full items-center justify-between border-b border-white/[0.05] bg-black/20 px-6 py-6 md:px-12 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <div className="h-3 w-3 bg-white" />
-          <span className="font-mono text-xs tracking-[0.15em] uppercase">ovrmn</span>
+      <nav className="fixed top-0 z-40 w-full border-b border-white/[0.05] bg-black/20 px-6 py-6 backdrop-blur-md md:px-12">
+        <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-3 w-3 bg-white" />
+            <span className="font-mono text-xs tracking-[0.15em] uppercase">ovrmn</span>
+          </div>
+          <div className="hidden justify-self-center gap-12 font-mono text-[10px] tracking-[0.15em] uppercase text-white/60 md:flex">
+            <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
+            <a href="#capabilities" className="hover:text-white transition-colors">Capabilities</a>
+            <a href="#teams" className="hover:text-white transition-colors">Teams</a>
+          </div>
+          <MetaTrackedLink
+            className="group justify-self-end flex items-center gap-2 border border-white/20 px-5 py-2 font-mono text-[10px] tracking-wider uppercase transition-all hover:bg-white hover:text-black"
+            customData={{
+              content_category: "Navigation",
+              content_name: "Book a demo",
+            }}
+            eventName="InitiateCheckout"
+            href="/book"
+          >
+            Get Free Pilot
+            <ArrowUpRight className="h-3 w-3" />
+          </MetaTrackedLink>
         </div>
-        <div className="hidden gap-12 font-mono text-[10px] tracking-[0.15em] uppercase text-white/60 md:flex">
-          <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
-          <a href="#capabilities" className="hover:text-white transition-colors">Capabilities</a>
-          <a href="#teams" className="hover:text-white transition-colors">Teams</a>
-        </div>
-        <MetaTrackedLink
-          className="group flex items-center gap-2 border border-white/20 px-5 py-2 font-mono text-[10px] tracking-wider uppercase transition-all hover:bg-white hover:text-black"
-          customData={{
-            content_category: "Navigation",
-            content_name: "Book a demo",
-          }}
-          eventName="InitiateCheckout"
-          href="/book"
-        >
-          Get Free Pilot
-          <ArrowUpRight className="h-3 w-3" />
-        </MetaTrackedLink>
       </nav>
 
       {/* SECTION 1 — HERO SECTION — THE ECLIPSE */}
@@ -186,7 +188,7 @@ export default function Home() {
       </section>
 
       {/* THE PROCESS — THE METHOD OF REFINEMENT — THE FOREST */}
-      <section className="relative w-full min-h-[700px] md:h-[70vh] md:min-h-[600px] md:max-h-[850px] flex items-center py-32 md:py-0 px-6 md:px-12 bg-black border-t border-white/[0.05] overflow-hidden">
+      <section className="relative flex w-full min-h-[760px] items-center overflow-hidden border-t border-white/[0.05] bg-black px-6 py-32 md:min-h-[820px] md:px-12 md:py-36">
         <div className="absolute inset-0 z-0 w-full h-full opacity-80">
           <Image 
             src="/forest.webp" 
@@ -288,7 +290,7 @@ export default function Home() {
       </section>
 
       {/* CLOSING — THE FINAL CALL — THE MOUNTAINS */}
-      <section className="relative w-full h-[80vh] min-h-[700px] max-h-[900px] flex flex-col items-center justify-center px-6 text-center bg-black overflow-hidden">
+      <section className="relative flex w-full min-h-[720px] flex-col items-center justify-center overflow-hidden bg-black px-6 py-28 text-center md:min-h-[760px] md:px-12 md:py-36">
         <div className="absolute inset-0 z-0 w-full h-full">
           <Image 
             src="/mountains.webp" 
