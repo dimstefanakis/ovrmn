@@ -35,20 +35,6 @@ const proofCards = [
   },
 ];
 
-const pilotSteps = [
-  "Review one high-friction workflow and the systems it depends on.",
-  "Read historical tickets, docs, dashboards, and team context.",
-  "Deploy one live workflow in one week inside the tools your team already uses.",
-  "Expand only after it performs in production.",
-];
-
-const rolloutControls = [
-  "Starts with one narrow workflow, not a full rip-and-replace.",
-  "Escalates edge cases instead of pretending every case is automatable.",
-  "Uses your historical operating memory as the source of truth.",
-  "Keeps humans in the loop where the workflow actually needs judgment.",
-];
-
 export default function Home() {
   const bgPath = "/bg.webp";
   const coastPath = "/coast.webp";
@@ -72,8 +58,8 @@ export default function Home() {
             <span className="font-mono text-xs tracking-[0.15em] uppercase">ovrmn</span>
           </div>
           <div className="hidden justify-self-center gap-12 font-mono text-[10px] tracking-[0.15em] uppercase text-white/60 md:flex">
-            <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
             <a href="#capabilities" className="hover:text-white transition-colors">Capabilities</a>
+            <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
             <a href="#teams" className="hover:text-white transition-colors">Teams</a>
           </div>
           <MetaTrackedLink
@@ -158,184 +144,16 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden border-y border-white/[0.05] bg-black px-6 py-24 md:px-12 md:py-28">
-        <div className="absolute inset-x-0 top-0 z-0 h-screen md:inset-0 md:h-auto">
-          <Image
-            src={skyscraperPath}
-            alt="City skyline"
-            fill
-            sizes="100vw"
-            className="object-cover object-center grayscale contrast-125 opacity-80"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/45 to-black/65" />
-          <div className="absolute inset-0 dither-bg opacity-18" />
-        </div>
-
-        <div className="relative z-10 mx-auto max-w-7xl">
-          <div className="max-w-3xl">
-              <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/50">
-                Trusted In Production
-              </span>
-              <h2 className="mt-6 font-serif text-4xl leading-tight md:text-6xl">
-                Already deployed at <br />
-                <span className="italic font-light text-white/70">
-                  ProductLab and Outperform.
-                </span>
-              </h2>
-              <p className="mt-8 max-w-2xl text-lg font-light leading-relaxed text-white/70 md:text-xl">
-                Serious operators do not need a philosophy lesson first. They
-                need to know the system is already running in production, then
-                they want to understand how fast it can go live in their own
-                environment.
-              </p>
-          </div>
-
-          <div className="mt-12 grid gap-px bg-white/[0.05] md:grid-cols-2">
-            {proofCompanies.map((company) => (
-              <div
-                key={company.name}
-                className="group border border-white/[0.06] bg-black/45 p-10 backdrop-blur-sm transition-colors hover:bg-white/[0.03]"
-              >
-                <div className="mb-5 font-mono text-[10px] tracking-[0.18em] uppercase text-white/35">
-                  Deployed At
-                </div>
-                <h3 className="font-serif text-3xl text-white/85 transition-colors group-hover:text-white">
-                  {company.name}
-                </h3>
-                <p className="mt-5 max-w-md text-base font-light leading-relaxed text-white/65">
-                  {company.context}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden bg-black px-6 py-28 md:px-12 md:py-32">
-        <div className="absolute inset-x-0 top-0 z-0 h-screen md:inset-0 md:h-auto">
-          <Image
-            src={roadPath}
-            alt="Open road"
-            fill
-            sizes="100vw"
-            className="object-cover object-center grayscale contrast-125 opacity-80"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/45 to-black/65" />
-          <div className="absolute inset-0 dither-bg opacity-18" />
-        </div>
-
-        <div className="relative z-10 mx-auto max-w-7xl">
-          <div className="flex flex-col items-start gap-8 border-b border-white/[0.1] pb-16">
-            <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/50">
-              Field Proof
-            </span>
-            <h2 className="font-serif text-4xl leading-tight md:text-6xl">
-              What the agent is already doing <br />
-              <span className="italic font-light text-white/70">
-                in production.
-              </span>
-            </h2>
-          </div>
-
-          <div className="mt-14 grid gap-px bg-white/[0.05] md:grid-cols-3">
-            {proofCards.map((card) => (
-              <div
-                key={card.title}
-                className="group border border-white/[0.06] bg-black/55 p-10 backdrop-blur-sm transition-colors hover:bg-white/[0.03]"
-              >
-                <div className="mb-6 font-mono text-[10px] uppercase tracking-[0.18em] text-white/35">
-                  {card.label}
-                </div>
-                <h3 className="font-serif text-3xl leading-snug text-white/85 transition-colors group-hover:text-white">
-                  {card.title}
-                </h3>
-                <p className="mt-6 text-base font-light leading-relaxed text-white/65">
-                  {card.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden border-y border-white/[0.05] bg-black px-6 py-28 md:px-12 md:py-36">
-        <div className="absolute inset-x-0 top-0 z-0 h-screen md:inset-0 md:h-auto">
-          <Image
-            src={coastPath}
-            alt="Coastline"
-            fill
-            sizes="100vw"
-            className="object-cover object-center grayscale contrast-125 opacity-82"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/45 to-black/68" />
-          <div className="absolute inset-0 dither-bg opacity-18" />
-        </div>
-
-        <div className="relative z-10 mx-auto max-w-7xl">
-          <div className="grid gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(360px,460px)] xl:items-start">
-            <div className="max-w-3xl">
-              <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/55">
-                7-Day Pilot
-              </span>
-              <h2 className="mt-8 font-serif text-5xl leading-tight md:text-7xl">
-                See your processes <br />
-                <span className="italic font-light text-white/75">
-                  in one week.
-                </span>
-              </h2>
-              <p className="mt-8 max-w-2xl text-xl font-light leading-relaxed text-white/70 md:text-2xl">
-                Get started with a cut of your data. In one week, we&apos;ll show
-                you a clear view of your workflows, ready for AI agents.
-              </p>
-              <div className="mt-14 grid gap-4 sm:grid-cols-2">
-                {pilotSteps.map((step, index) => (
-                  <div
-                    key={step}
-                    className="border border-white/[0.12] bg-black/35 p-5 backdrop-blur-sm"
-                  >
-                    <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/35">
-                      {String(index + 1).padStart(2, "0")}
-                    </div>
-                    <p className="mt-3 text-sm font-light leading-relaxed text-white/75">
-                      {step}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="border border-white/[0.12] bg-black/45 p-8 backdrop-blur-md">
-              <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">
-                Controlled Rollout
-              </div>
-              <h3 className="mt-5 font-serif text-3xl leading-tight text-white/90">
-                Serious automation stays controlled.
-              </h3>
-              <div className="mt-8 space-y-4">
-                {rolloutControls.map((item) => (
-                  <div
-                    key={item}
-                    className="border-l border-white/15 pl-5 text-sm font-light leading-relaxed text-white/72"
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* THESIS SECTION — THE PORTRAIT */}
       <section id="thesis" className="bg-black py-60 px-6 md:px-12 border-y border-white/[0.05]">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-24 lg:grid-cols-2 lg:items-center">
             <div className="relative order-2 lg:order-1">
               <div className="aspect-[3/4] w-full max-w-lg bg-white/[0.02] border border-white/[0.1] relative overflow-hidden">
-                <Image 
-                  src={portraitPath} 
-                  alt="Portrait of Sovereignty" 
-                  fill 
+                <Image
+                  src={portraitPath}
+                  alt="Portrait of Sovereignty"
+                  fill
                   sizes="(min-width: 1024px) 40vw, 100vw"
                   className="object-cover grayscale contrast-125"
                 />
@@ -505,51 +323,174 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CLOSING — THE FINAL CALL — THE MOUNTAINS */}
-      <section className="relative flex w-full min-h-[720px] flex-col items-center justify-center overflow-hidden bg-black px-6 py-28 text-center md:min-h-[760px] md:px-12 md:py-36">
-        <div className="absolute inset-0 z-0 w-full h-full">
-          <Image 
-            src="/mountains.webp" 
-            alt="Mountains" 
-            fill 
+      <section className="relative overflow-hidden bg-black px-6 py-28 md:px-12 md:py-32">
+        <div className="absolute inset-x-0 top-0 z-0 h-screen md:inset-0 md:h-auto">
+          <Image
+            src={roadPath}
+            alt="Open road"
+            fill
             sizes="100vw"
-            priority
-            className="object-cover object-bottom grayscale contrast-[1.05]"
+            className="object-cover object-center grayscale contrast-125 opacity-80"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-black/30" />
-          <div className="absolute inset-0 dither-bg opacity-15" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/45 to-black/65" />
+          <div className="absolute inset-0 dither-bg opacity-18" />
         </div>
 
-        <div className="relative z-10 flex flex-col items-center">
-          <div className="h-24 w-[1px] bg-white/20 mb-16" />
-          
-          <h2 className="max-w-5xl font-serif text-6xl leading-tight md:text-8xl">
-            See your processes <br />
-            <span className="italic font-light text-white/60">in one week.</span>
-          </h2>
-          <p className="mt-8 max-w-2xl text-lg font-light leading-relaxed text-white/70 md:text-2xl">
-            Get started with a cut of your data. In one week, we&apos;ll show you a
-            clear view of your workflows, ready for AI agents.
-          </p>
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="flex flex-col items-start gap-8 border-b border-white/[0.1] pb-16">
+            <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/50">
+              Field Proof
+            </span>
+            <h2 className="font-serif text-4xl leading-tight md:text-6xl">
+              What the agent is already doing <br />
+              <span className="italic font-light text-white/70">
+                in production.
+              </span>
+            </h2>
+          </div>
 
-          <div className="mt-16 flex flex-col items-center gap-6">
-            <MetaTrackedLink
-              className="inline-flex h-20 min-w-[320px] items-center justify-center bg-white px-12 font-mono text-xs tracking-[0.2em] uppercase text-black hover:bg-neutral-200 transition-all"
-              customData={{
-                content_category: "Closing CTA",
-                content_name: "Book Free 7-Day Pilot",
-              }}
-              eventName="InitiateCheckout"
-              href="/book"
-            >
-              Book Free Pilot
-            </MetaTrackedLink>
-            <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-white/30">We build it on your data. You only pay if it works.</span>
+          <div className="mt-14 grid gap-px bg-white/[0.05] md:grid-cols-3">
+            {proofCards.map((card) => (
+              <div
+                key={card.title}
+                className="group border border-white/[0.06] bg-black/55 p-10 backdrop-blur-sm transition-colors hover:bg-white/[0.03]"
+              >
+                <div className="mb-6 font-mono text-[10px] uppercase tracking-[0.18em] text-white/35">
+                  {card.label}
+                </div>
+                <h3 className="font-serif text-3xl leading-snug text-white/85 transition-colors group-hover:text-white">
+                  {card.title}
+                </h3>
+                <p className="mt-6 text-base font-light leading-relaxed text-white/65">
+                  {card.body}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* FOOTER — INSTITUTIONAL */}
+      <section className="relative overflow-hidden border-y border-white/[0.05] bg-black px-6 py-24 md:px-12 md:py-28">
+        <div className="absolute inset-x-0 top-0 z-0 h-screen md:inset-0 md:h-auto">
+          <Image
+            src={skyscraperPath}
+            alt="City skyline"
+            fill
+            sizes="100vw"
+            className="object-cover object-center grayscale contrast-125 opacity-80"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/45 to-black/65" />
+          <div className="absolute inset-0 dither-bg opacity-18" />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="max-w-3xl">
+              <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/50">
+                Trusted In Production
+              </span>
+              <h2 className="mt-6 font-serif text-4xl leading-tight md:text-6xl">
+                Already deployed at <br />
+                <span className="italic font-light text-white/70">
+                  ProductLab and Outperform.
+                </span>
+              </h2>
+              <p className="mt-8 max-w-2xl text-lg font-light leading-relaxed text-white/70 md:text-xl">
+                Serious operators do not need a philosophy lesson first. They
+                need to know the system is already running in production, then
+                they want to understand how fast it can go live in their own
+                environment.
+              </p>
+          </div>
+
+          <div className="mt-12 grid gap-px bg-white/[0.05] md:grid-cols-2">
+            {proofCompanies.map((company) => (
+              <div
+                key={company.name}
+                className="group border border-white/[0.06] bg-black/45 p-10 backdrop-blur-sm transition-colors hover:bg-white/[0.03]"
+              >
+                <div className="mb-5 font-mono text-[10px] tracking-[0.18em] uppercase text-white/35">
+                  Deployed At
+                </div>
+                <h3 className="font-serif text-3xl text-white/85 transition-colors group-hover:text-white">
+                  {company.name}
+                </h3>
+                <p className="mt-5 max-w-md text-base font-light leading-relaxed text-white/65">
+                  {company.context}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-black px-6 py-24 md:px-12 md:py-32">
+        <div className="mx-auto max-w-7xl">
+          <div className="relative overflow-hidden rounded-[8px] border border-white/[0.12] bg-white/[0.04] p-6 md:p-10 lg:p-14">
+            <div className="pointer-events-none absolute inset-0 z-0">
+              <Image
+                src={coastPath}
+                alt=""
+                fill
+                sizes="100vw"
+                className="object-cover object-center grayscale opacity-20"
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-black via-black/82 to-black/55" />
+              <div className="absolute inset-0 dither-bg opacity-20" />
+            </div>
+
+            <div className="relative z-10 grid min-h-[560px] content-between gap-16">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="h-2.5 w-2.5 rounded-full bg-white/45" />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/50">
+                    Zero-Setup Pilot
+                  </span>
+                </div>
+
+                <div className="mt-14 max-w-6xl">
+                  <h2 className="font-serif text-5xl leading-[0.95] text-white md:text-7xl lg:text-[96px]">
+                    See your processes <br />
+                    <span className="italic font-light text-white/55">
+                      in one week.
+                    </span>
+                  </h2>
+                  <p className="mt-8 max-w-2xl text-lg font-light leading-relaxed text-white/62 md:text-2xl">
+                    Get started with a cut of your data. In one week, we&apos;ll
+                    show you a clear view of your workflows, ready for AI
+                    agents.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-[minmax(0,360px)_1fr_auto] md:items-end">
+                <MetaTrackedLink
+                  className="group inline-flex h-16 w-full items-center justify-between rounded-[8px] border border-white bg-white px-6 font-mono text-[10px] uppercase tracking-[0.16em] text-black transition-colors hover:bg-transparent hover:text-white"
+                  customData={{
+                    content_category: "Closing CTA",
+                    content_name: "Book Free 7-Day Pilot",
+                  }}
+                  eventName="InitiateCheckout"
+                  href="/book"
+                >
+                  <span className="flex items-center gap-3">
+                    <span className="h-2 w-2 bg-black transition-colors group-hover:bg-white" />
+                    Book Free Pilot
+                  </span>
+                  <ArrowUpRight className="h-3 w-3" />
+                </MetaTrackedLink>
+
+                <p className="max-w-sm font-mono text-[10px] uppercase leading-relaxed tracking-[0.15em] text-white/35 md:pb-1">
+                  Built on your data. Pay only if it works.
+                </p>
+
+                <div className="grid h-16 w-16 place-items-center rounded-[8px] border border-white/15 bg-white/[0.06]">
+                  <div className="h-3 w-3 bg-white" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
       <footer className="bg-black border-t border-white/[0.1] pt-40 pb-20 px-6 md:px-12">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between gap-32">
@@ -585,8 +526,8 @@ export default function Home() {
               <div className="space-y-10">
                 <h5 className="font-mono text-[10px] tracking-[0.2em] uppercase text-white/80">Company</h5>
                 <ul className="space-y-6 font-mono text-[10px] tracking-[0.15em] text-white/50 uppercase">
-                  <li><a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
                   <li><a href="#capabilities" className="hover:text-white transition-colors">Capabilities</a></li>
+                  <li><a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a></li>
                   <li><a href="#teams" className="hover:text-white transition-colors">Teams</a></li>
                 </ul>
               </div>
