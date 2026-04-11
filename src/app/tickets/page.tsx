@@ -30,6 +30,51 @@ const channels = [
   },
 ];
 
+const proofCompanies = [
+  {
+    name: "ProductLab",
+    context:
+      "Consumer transaction-data company with 150k+ panelists and 6M+ documents processed.",
+  },
+  {
+    name: "Outperform",
+    context:
+      "Performance marketing agency with $100M+/year in managed paid media spend.",
+  },
+];
+
+const proofCards = [
+  {
+    label: "ProductLab // support",
+    title: "Support tickets resolved in minutes, not hours.",
+    body: "Deployed across support, fraud detection, and engineering monitoring. The agent reads the case, pulls internal context, drafts the response, and escalates engineering with the likely cause attached.",
+  },
+  {
+    label: "ProductLab // fraud + monitoring",
+    title: "Fraud patterns surfaced and irregularities were caught before traditional alerts.",
+    body: "Cross-system signals get assembled into one operational brief, so the team is not waiting on fragmented tools to notice the problem.",
+  },
+  {
+    label: "Outperform // ad monitoring",
+    title: "$10k+ saved per incident caught early.",
+    body: "The agent monitors campaign spend 24/7, flags anomalies in real time, and removes the need for manual dashboard checks.",
+  },
+];
+
+const pilotSteps = [
+  "Review historical tickets, docs, Slack threads, and product context.",
+  "Deploy one live workflow for one repetitive ticket class.",
+  "Escalate edge cases to humans with the answer trail attached.",
+  "Measure performance in production. You only pay if it works.",
+];
+
+const rolloutControls = [
+  "Starts on repetitive ticket classes, not the whole queue.",
+  "Escalates edge cases to humans instead of forcing bad automation.",
+  "Uses your historical resolutions as source memory.",
+  "Runs inside existing channels, not a new inbox your team has to adopt.",
+];
+
 const capabilities = [
   {
     title: "Reads the Whole Case",
@@ -84,7 +129,10 @@ const useCases = [
 
 export default function TicketsPage() {
   const bgPath = "/bg.webp";
+  const coastPath = "/coast.webp";
   const portraitPath = "/alexander.webp";
+  const roadPath = "/road.webp";
+  const skyscraperPath = "/skyscraper.webp";
   const supportFlowVideoPath = "/support-flow-web.mp4";
   const supportFlowPosterPath = "/support-flow-poster.jpg";
 
@@ -118,12 +166,12 @@ export default function TicketsPage() {
             className="group justify-self-end flex items-center gap-2 border border-white/20 px-5 py-2 font-mono text-[10px] tracking-wider uppercase transition-all hover:bg-white hover:text-black"
             customData={{
               content_category: "Navigation",
-              content_name: "Book a demo - tickets",
+              content_name: "Book Free 7-Day Pilot - tickets",
             }}
             eventName="InitiateCheckout"
             href="/book"
           >
-            Get Free Pilot
+            Book Free Pilot
             <ArrowUpRight className="h-3 w-3" />
           </MetaTrackedLink>
         </div>
@@ -181,12 +229,12 @@ export default function TicketsPage() {
                   className="inline-flex h-16 min-w-[240px] items-center justify-center border border-white bg-white px-8 font-mono text-[10px] tracking-[0.15em] uppercase text-black transition-all hover:bg-transparent hover:text-white"
                   customData={{
                     content_category: "Hero",
-                    content_name: "Get your free pilot - tickets",
+                    content_name: "Book Free 7-Day Pilot - tickets",
                   }}
                   eventName="InitiateCheckout"
                   href="/book"
                 >
-                  Get Your Free Pilot
+                  Book Free 7-Day Pilot
                 </MetaTrackedLink>
                 <a
                   className="hidden h-16 items-center gap-4 px-8 font-mono text-[10px] tracking-[0.15em] uppercase text-white/60 transition-all hover:text-white sm:flex"
@@ -211,6 +259,180 @@ export default function TicketsPage() {
             Email / Chat / Help Desk / Slack / Custom
           </div>
           <div className="mx-auto h-px w-32 bg-white/20" />
+        </div>
+      </section>
+
+      <section
+        className="relative overflow-hidden border-y border-white/[0.05] bg-black px-6 py-24 md:px-12 md:py-28"
+      >
+        <div className="absolute inset-x-0 top-0 z-0 h-screen md:inset-0 md:h-auto">
+          <Image
+            src={skyscraperPath}
+            alt="City skyline"
+            fill
+            sizes="100vw"
+            className="object-cover object-center grayscale contrast-125 opacity-80"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/45 to-black/65" />
+          <div className="absolute inset-0 dither-bg opacity-18" />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="max-w-3xl">
+            <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/50">
+              Trusted In Production
+            </span>
+            <h2 className="mt-6 font-serif text-4xl leading-tight md:text-6xl">
+              Already deployed at <br />
+              <span className="italic font-light text-white/70">
+                ProductLab and Outperform.
+              </span>
+            </h2>
+            <p className="mt-8 max-w-2xl text-lg font-light leading-relaxed text-white/70 md:text-xl">
+              The support pitch is not theoretical. ovrmn is already running
+              inside real operating environments, which means the rollout story
+              is about bringing proven workflows to your stack, not asking you
+              to sponsor an experiment.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-px bg-white/[0.05] md:grid-cols-2">
+            {proofCompanies.map((company) => (
+              <div
+                key={company.name}
+                className="group border border-white/[0.06] bg-black/45 p-10 backdrop-blur-sm transition-colors hover:bg-white/[0.03]"
+              >
+                <div className="mb-5 font-mono text-[10px] tracking-[0.18em] uppercase text-white/35">
+                  Deployed At
+                </div>
+                <h3 className="font-serif text-3xl text-white/85 transition-colors group-hover:text-white">
+                  {company.name}
+                </h3>
+                <p className="mt-5 max-w-md text-base font-light leading-relaxed text-white/65">
+                  {company.context}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative overflow-hidden bg-black px-6 py-28 md:px-12 md:py-32">
+        <div className="absolute inset-x-0 top-0 z-0 h-screen md:inset-0 md:h-auto">
+          <Image
+            src={roadPath}
+            alt="Open road"
+            fill
+            sizes="100vw"
+            className="object-cover object-center grayscale contrast-125 opacity-80"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/45 to-black/65" />
+          <div className="absolute inset-0 dither-bg opacity-18" />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="flex flex-col items-start gap-8 border-b border-white/[0.1] pb-16">
+            <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/50">
+              Field Proof
+            </span>
+            <h2 className="font-serif text-4xl leading-tight md:text-6xl">
+              What the agent is already doing <br />
+              <span className="italic font-light text-white/70">
+                in production.
+              </span>
+            </h2>
+          </div>
+
+          <div className="mt-14 grid gap-px bg-white/[0.05] md:grid-cols-3">
+            {proofCards.map((card) => (
+              <div
+                key={card.title}
+                className="group border border-white/[0.06] bg-black/55 p-10 backdrop-blur-sm transition-colors hover:bg-white/[0.03]"
+              >
+                <div className="mb-6 font-mono text-[10px] uppercase tracking-[0.18em] text-white/35">
+                  {card.label}
+                </div>
+                <h3 className="font-serif text-3xl leading-snug text-white/85 transition-colors group-hover:text-white">
+                  {card.title}
+                </h3>
+                <p className="mt-6 text-base font-light leading-relaxed text-white/65">
+                  {card.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="pilot"
+        className="relative overflow-hidden border-y border-white/[0.05] bg-black px-6 py-28 md:px-12 md:py-36"
+      >
+        <div className="absolute inset-x-0 top-0 z-0 h-screen md:inset-0 md:h-auto">
+          <Image
+            src={coastPath}
+            alt="Coastline"
+            fill
+            sizes="100vw"
+            className="object-cover object-center grayscale contrast-125 opacity-82"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/45 to-black/68" />
+          <div className="absolute inset-0 dither-bg opacity-18" />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-7xl">
+          <div className="grid gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(360px,460px)] xl:items-start">
+            <div className="max-w-3xl">
+              <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-white/55">
+                7-Day Pilot
+              </span>
+              <h2 className="mt-8 font-serif text-5xl leading-tight md:text-7xl">
+                See your support process <br />
+                <span className="italic font-light text-white/75">
+                  in one week.
+                </span>
+              </h2>
+              <p className="mt-8 max-w-2xl text-xl font-light leading-relaxed text-white/70 md:text-2xl">
+                Get started with a cut of your ticket history. In one week,
+                we&apos;ll show you a clear view of your support workflow, ready
+                for an AI agent.
+              </p>
+              <div className="mt-14 grid gap-4 sm:grid-cols-2">
+                {pilotSteps.map((step, index) => (
+                  <div
+                    key={step}
+                    className="border border-white/[0.12] bg-black/35 p-5 backdrop-blur-sm"
+                  >
+                    <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/35">
+                      {String(index + 1).padStart(2, "0")}
+                    </div>
+                    <p className="mt-3 text-sm font-light leading-relaxed text-white/75">
+                      {step}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="border border-white/[0.12] bg-black/45 p-8 backdrop-blur-md">
+              <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">
+                Controlled Rollout
+              </div>
+              <h3 className="mt-5 font-serif text-3xl leading-tight text-white/90">
+                Automation without roulette.
+              </h3>
+              <div className="mt-8 space-y-4">
+                {rolloutControls.map((item) => (
+                  <div
+                    key={item}
+                    className="border-l border-white/15 pl-5 text-sm font-light leading-relaxed text-white/72"
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -483,23 +705,28 @@ export default function TicketsPage() {
           <div className="mb-16 h-24 w-[1px] bg-white/20" />
 
           <h2 className="max-w-5xl font-serif text-6xl leading-tight md:text-8xl">
-            You already solved these tickets once. <br />
+            See your support process <br />
             <span className="italic font-light text-white/60">
-              ovrmn solves them every time.
+              in one week.
             </span>
           </h2>
+          <p className="mt-8 max-w-2xl text-lg font-light leading-relaxed text-white/70 md:text-2xl">
+            Get started with a cut of your ticket history. In one week, we&apos;ll
+            show you a clear view of your support workflow, ready for an AI
+            agent.
+          </p>
 
-          <div className="mt-24 flex flex-col items-center gap-6">
+          <div className="mt-16 flex flex-col items-center gap-6">
             <MetaTrackedLink
               className="inline-flex h-20 min-w-[320px] items-center justify-center bg-white px-12 font-mono text-xs tracking-[0.2em] uppercase text-black transition-all hover:bg-neutral-200"
               customData={{
                 content_category: "Closing CTA",
-                content_name: "Get your free pilot - tickets",
+                content_name: "Book Free 7-Day Pilot - tickets",
               }}
               eventName="InitiateCheckout"
               href="/book"
             >
-              Get Your Free Pilot
+              Book Free Pilot
             </MetaTrackedLink>
             <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-white/30">
               We build it on your support history. You only pay if it works.
