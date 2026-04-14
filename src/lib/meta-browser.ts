@@ -127,18 +127,18 @@ export function trackMetaLead(
   eventId: string,
   payload: {
     companyName: string;
-    team?: string;
+    workflow?: string;
+    workContext?: string[];
     teamSize?: string;
-    tools?: string[];
   }
 ) {
   trackMetaBrowserEvent({
     customData: {
       content_category: "Book demo",
       content_name: "OVRMN book demo",
-      team: payload.team || "",
+      workflow: payload.workflow || "",
+      work_context: payload.workContext?.join(", ") || "",
       team_size: payload.teamSize || "",
-      tools: payload.tools?.join(", ") || "",
       company_name: payload.companyName,
     },
     eventId,
@@ -151,9 +151,9 @@ export function trackMetaCompleteRegistration(
   payload: {
     companyName: string;
     email: string;
-    team?: string;
+    workflow?: string;
+    workContext?: string[];
     teamSize?: string;
-    tools?: string[];
   }
 ) {
   trackMetaBrowserEvent({
@@ -162,9 +162,9 @@ export function trackMetaCompleteRegistration(
       content_category: "Book demo",
       content_name: "OVRMN book demo completion",
       email_domain: payload.email.split("@")[1] || "",
-      team: payload.team || "",
+      workflow: payload.workflow || "",
+      work_context: payload.workContext?.join(", ") || "",
       team_size: payload.teamSize || "",
-      tools: payload.tools?.join(", ") || "",
     },
     eventId,
     eventName: "CompleteRegistration",

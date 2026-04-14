@@ -4,13 +4,11 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Check, LoaderCircle, ArrowRight, ArrowLeft } from "lucide-react";
 import {
-  TEAM_OPTIONS,
-  TEAM_SIZE_OPTIONS,
-  TOOL_OPTIONS,
+  WORKFLOW_OPTIONS,
+  WORK_CONTEXT_OPTIONS,
   type BookDemoFieldErrors,
-  type TeamOption,
-  type TeamSizeOption,
-  type ToolOption,
+  type WorkflowOption,
+  type WorkContextOption,
   validateBookDemoSubmission,
   isValidEmail,
   isWorkEmail,
@@ -25,48 +23,43 @@ import posthog from "posthog-js";
 type FormState = {
   workEmail: string;
   companyName: string;
-  team: TeamOption | "";
-  tools: ToolOption[];
-  teamSize: TeamSizeOption | "";
-  bottleneck: string;
+  workflow: WorkflowOption | "";
+  workContext: WorkContextOption[];
+  repeatingWork: string;
 };
 
 type StepKey = keyof FormState;
 
 const STEP_ORDER: StepKey[] = [
-  "workEmail",
   "companyName",
-  "team",
-  "teamSize",
-  "tools",
-  "bottleneck",
+  "workflow",
+  "workContext",
+  "repeatingWork",
+  "workEmail",
 ];
 
 const INITIAL_STATE: FormState = {
   workEmail: "",
   companyName: "",
-  team: "",
-  tools: [],
-  teamSize: "",
-  bottleneck: "",
+  workflow: "",
+  workContext: [],
+  repeatingWork: "",
 };
 
 const STEP_LABELS: Record<StepKey, string> = {
   workEmail: "Work Email",
-  companyName: "Company Name",
-  team: "Primary Team",
-  teamSize: "Team Size",
-  tools: "Daily Tools",
-  bottleneck: "Operational Bottleneck",
+  companyName: "Company",
+  workflow: "Work Type",
+  workContext: "Current Tools",
+  repeatingWork: "Context",
 };
 
 const STEP_PROMPTS: Record<StepKey, string> = {
-  workEmail: "What's your work email?",
-  companyName: "What company are you with?",
-  team: "Which team is this for?",
-  teamSize: "How large is the team?",
-  tools: "What tools do they use?",
-  bottleneck: "Any specific bottleneck to solve?",
+  workEmail: "Where should we send the pilot plan?",
+  companyName: "What company is this for?",
+  workflow: "What work should we make repeatable?",
+  workContext: "Where does your team handle it today?",
+  repeatingWork: "What keeps coming up?",
 };
 
 export function BookDemoFlow() {
@@ -92,7 +85,9 @@ export function BookDemoFlow() {
     if (step === "workEmail") {
       if (!form.workEmail.trim()) return "Required";
       if (!isValidEmail(form.workEmail)) return "Invalid email";
-      if (!isWorkEmail(form.workEmail)) return "Work email required";
+      if (!isWorkEmail(form.workEmail)) {
+        return "Please use a company email so we can match this to the right account.";
+      }
     }
     if (step === "companyName") {
       if (!form.companyName.trim()) return "Required";
@@ -106,17 +101,17 @@ export function BookDemoFlow() {
     setSubmitError("");
   }
 
-  function toggleTool(tool: ToolOption) {
+  function toggleWorkContext(entry: WorkContextOption) {
     setForm((current) => {
-      const exists = current.tools.includes(tool);
+      const exists = current.workContext.includes(entry);
       return {
         ...current,
-        tools: exists
-          ? current.tools.filter((entry) => entry !== tool)
-          : [...current.tools, tool],
+        workContext: exists
+          ? current.workContext.filter((currentEntry) => currentEntry !== entry)
+          : [...current.workContext, entry],
       };
     });
-    setErrors((current) => ({ ...current, tools: undefined, form: undefined }));
+    setErrors((current) => ({ ...current, workContext: undefined, form: undefined }));
     setSubmitError("");
   }
 
@@ -139,9 +134,10 @@ export function BookDemoFlow() {
     setSubmitError("");
 
     posthog.capture("book_demo_form_submitted", {
-      team: validation.data.team,
+      workflow: validation.data.workflow,
+      work_context: validation.data.workContext,
       team_size: validation.data.teamSize,
-      tools: validation.data.tools,
+      repeating_work: validation.data.repeatingWork,
     });
 
     try {
@@ -172,27 +168,28 @@ export function BookDemoFlow() {
 
       trackMetaLead(eventId, {
         companyName: validation.data.companyName,
-        team: validation.data.team,
+        workflow: validation.data.workflow,
+        workContext: validation.data.workContext,
         teamSize: validation.data.teamSize,
-        tools: validation.data.tools,
       });
       trackMetaCompleteRegistration(eventId, {
         companyName: validation.data.companyName,
         email: validation.data.workEmail,
-        team: validation.data.team,
+        workflow: validation.data.workflow,
+        workContext: validation.data.workContext,
         teamSize: validation.data.teamSize,
-        tools: validation.data.tools,
       });
       posthog.identify(validation.data.workEmail, {
         email: validation.data.workEmail,
         company: validation.data.companyName,
-        team: validation.data.team,
+        workflow: validation.data.workflow,
         team_size: validation.data.teamSize,
       });
       posthog.capture("book_demo_submission_succeeded", {
-        team: validation.data.team,
+        workflow: validation.data.workflow,
+        work_context: validation.data.workContext,
         team_size: validation.data.teamSize,
-        tools: validation.data.tools,
+        repeating_work: validation.data.repeatingWork,
       });
       setIsSuccess(true);
     } catch (error) {
@@ -410,18 +407,18 @@ export function BookDemoFlow() {
             value={form.companyName}
           />
         );
-      case "team":
+      case "workflow":
         return (
           <div className="grid gap-3 sm:grid-cols-2">
-            {TEAM_OPTIONS.map((opt) => (
+            {WORKFLOW_OPTIONS.map((opt) => (
               <button
                 className={`flex h-16 items-center rounded-2xl border px-6 text-left transition-all ${
-                  form.team === opt
+                  form.workflow === opt
                     ? "border-white bg-white text-black"
                     : "border-white/10 bg-white/5 text-white/60 hover:border-white/30 hover:bg-white/[0.08]"
                 }`}
                 key={opt}
-                onClick={() => setField("team", opt)}
+                onClick={() => setField("workflow", opt)}
                 type="button"
               >
                 <span className="font-sans text-lg">{opt}</span>
@@ -429,30 +426,11 @@ export function BookDemoFlow() {
             ))}
           </div>
         );
-      case "teamSize":
-        return (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {TEAM_SIZE_OPTIONS.map((opt) => (
-              <button
-                className={`flex h-16 items-center rounded-2xl border px-6 text-left transition-all ${
-                  form.teamSize === opt
-                    ? "border-white bg-white text-black"
-                    : "border-white/10 bg-white/5 text-white/60 hover:border-white/30 hover:bg-white/[0.08]"
-                }`}
-                key={opt}
-                onClick={() => setField("teamSize", opt)}
-                type="button"
-              >
-                <span className="font-sans text-lg">{opt}</span>
-              </button>
-            ))}
-          </div>
-        );
-      case "tools":
+      case "workContext":
         return (
           <div className="flex flex-wrap gap-3">
-            {TOOL_OPTIONS.map((tool) => {
-              const active = form.tools.includes(tool);
+            {WORK_CONTEXT_OPTIONS.map((entry) => {
+              const active = form.workContext.includes(entry);
               return (
                 <button
                   className={`rounded-full border px-6 py-3 text-sm transition-all ${
@@ -460,24 +438,24 @@ export function BookDemoFlow() {
                       ? "border-white bg-white text-black"
                       : "border-white/10 bg-white/5 text-white/60 hover:border-white/30 hover:bg-white/[0.08]"
                   }`}
-                  key={tool}
-                  onClick={() => toggleTool(tool)}
+                  key={entry}
+                  onClick={() => toggleWorkContext(entry)}
                   type="button"
                 >
-                  {tool}
+                  {entry}
                 </button>
               );
             })}
           </div>
         );
-      case "bottleneck":
+      case "repeatingWork":
         return (
           <textarea
             autoFocus
             className="min-h-[160px] w-full rounded-[2rem] border border-white/10 bg-white/5 p-8 font-sans text-xl text-white outline-none placeholder:text-white/10 focus:border-white/30 transition-colors"
-            onChange={(e) => setField("bottleneck", e.target.value)}
-            placeholder="Tell us about your biggest challenge... (optional)"
-            value={form.bottleneck}
+            onChange={(e) => setField("repeatingWork", e.target.value)}
+            placeholder="Promo-code tickets, manual routing, spend spikes, Slack escalations... (optional)"
+            value={form.repeatingWork}
           />
         );
       default:

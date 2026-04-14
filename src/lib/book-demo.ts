@@ -1,25 +1,28 @@
-export const TEAM_OPTIONS = [
-  "Engineering",
-  "Marketing",
-  "Support",
-  "Ops",
-  "Other",
+export const WORKFLOW_OPTIONS = [
+  "Support tickets",
+  "Campaign monitoring",
+  "Fraud checks",
+  "Engineering ops",
+  "Other repeated work",
 ] as const;
 
-export const TOOL_OPTIONS = [
+export const WORK_CONTEXT_OPTIONS = [
+  "Email",
   "Slack",
+  "Zendesk",
+  "Intercom",
+  "Shopify",
+  "HubSpot",
   "Asana",
   "Jira",
-  "HubSpot",
-  "Zendesk",
   "Salesforce",
-  "custom/internal tools",
+  "Internal tools",
 ] as const;
 
 export const TEAM_SIZE_OPTIONS = ["1-5", "6-20", "21-50", "50+"] as const;
 
-export type TeamOption = (typeof TEAM_OPTIONS)[number];
-export type ToolOption = (typeof TOOL_OPTIONS)[number];
+export type WorkflowOption = (typeof WORKFLOW_OPTIONS)[number];
+export type WorkContextOption = (typeof WORK_CONTEXT_OPTIONS)[number];
 export type TeamSizeOption = (typeof TEAM_SIZE_OPTIONS)[number];
 
 export type BookDemoAttribution = {
@@ -39,10 +42,10 @@ export type BookDemoAttribution = {
 export type BookDemoSubmission = {
   workEmail: string;
   companyName: string;
-  team?: TeamOption;
-  tools?: ToolOption[];
+  workflow?: WorkflowOption;
+  workContext?: WorkContextOption[];
   teamSize?: TeamSizeOption;
-  bottleneck?: string;
+  repeatingWork?: string;
   eventId?: string;
   pageUrl?: string;
   referrer?: string;
@@ -53,10 +56,10 @@ export type BookDemoFieldErrors = Partial<
   Record<
     | "workEmail"
     | "companyName"
-    | "team"
-    | "tools"
+    | "workflow"
+    | "workContext"
     | "teamSize"
-    | "bottleneck"
+    | "repeatingWork"
     | "form",
     string
   >
@@ -83,9 +86,21 @@ const PERSONAL_EMAIL_DOMAINS = new Set([
   "ymail.com",
 ]);
 
-const TEAM_SET = new Set<string>(TEAM_OPTIONS);
-const TOOL_SET = new Set<string>(TOOL_OPTIONS);
+const WORKFLOW_SET = new Set<string>(WORKFLOW_OPTIONS);
+const WORK_CONTEXT_SET = new Set<string>(WORK_CONTEXT_OPTIONS);
 const TEAM_SIZE_SET = new Set<string>(TEAM_SIZE_OPTIONS);
+const LEGACY_WORKFLOW_MAP: Record<string, WorkflowOption> = {
+  Engineering: "Engineering ops",
+  Marketing: "Campaign monitoring",
+  Support: "Support tickets",
+  Ops: "Other repeated work",
+  Other: "Other repeated work",
+  "Fraud / risk": "Fraud checks",
+};
+const LEGACY_WORK_CONTEXT_MAP: Record<string, WorkContextOption> = {
+  "custom/internal tools": "Internal tools",
+  "Custom/internal tools": "Internal tools",
+};
 
 export function normalizeEmail(value: string) {
   return value.trim().toLowerCase();
@@ -115,12 +130,19 @@ export function validateBookDemoSubmission(
 
   const workEmail = normalizeEmail(asString(candidate.workEmail));
   const companyName = asString(candidate.companyName).trim();
-  const team = asString(candidate.team).trim();
-  const tools = Array.isArray(candidate.tools)
-    ? candidate.tools.map((tool) => asString(tool).trim()).filter(Boolean)
+  const rawWorkflow = asString(candidate.workflow ?? candidate.team).trim();
+  const workflow = LEGACY_WORKFLOW_MAP[rawWorkflow] || rawWorkflow;
+  const rawWorkContext = candidate.workContext ?? candidate.tools;
+  const workContext = Array.isArray(rawWorkContext)
+    ? rawWorkContext
+        .map((entry) => asString(entry).trim())
+        .filter(Boolean)
+        .map((entry) => LEGACY_WORK_CONTEXT_MAP[entry] || entry)
     : [];
   const teamSize = asString(candidate.teamSize).trim();
-  const bottleneck = asString(candidate.bottleneck).trim();
+  const repeatingWork = asString(
+    candidate.repeatingWork ?? candidate.bottleneck
+  ).trim();
   const eventId = asString(candidate.eventId).trim();
   const pageUrl = asString(candidate.pageUrl).trim();
   const referrer = asString(candidate.referrer).trim();
@@ -133,7 +155,8 @@ export function validateBookDemoSubmission(
   } else if (!isValidEmail(workEmail)) {
     errors.workEmail = "Invalid email";
   } else if (!isWorkEmail(workEmail)) {
-    errors.workEmail = "Work email required";
+    errors.workEmail =
+      "Please use a company email so we can match this to the right account.";
   }
 
   if (!companyName) {
@@ -142,20 +165,23 @@ export function validateBookDemoSubmission(
     errors.companyName = "Too long";
   }
 
-  if (team && !TEAM_SET.has(team)) {
-    errors.team = "Choose a valid team option.";
+  if (workflow && !WORKFLOW_SET.has(workflow)) {
+    errors.workflow = "Choose a valid workflow option.";
   }
 
-  if (tools.length > 0 && tools.some((tool) => !TOOL_SET.has(tool))) {
-    errors.tools = "One of the selected tools is not supported.";
+  if (
+    workContext.length > 0 &&
+    workContext.some((entry) => !WORK_CONTEXT_SET.has(entry))
+  ) {
+    errors.workContext = "One of the selected places is not supported.";
   }
 
   if (teamSize && !TEAM_SIZE_SET.has(teamSize)) {
     errors.teamSize = "Pick a valid team size band.";
   }
 
-  if (bottleneck.length > 1000) {
-    errors.bottleneck = "Keep the bottleneck note under 1000 characters.";
+  if (repeatingWork.length > 1000) {
+    errors.repeatingWork = "Keep this note under 1000 characters.";
   }
 
   if (pageUrl && pageUrl.length > 500) {
@@ -171,10 +197,13 @@ export function validateBookDemoSubmission(
     data: {
       workEmail,
       companyName,
-      team: (team as TeamOption) || undefined,
-      tools: tools.length > 0 ? (Array.from(new Set(tools)) as ToolOption[]) : undefined,
+      workflow: (workflow as WorkflowOption) || undefined,
+      workContext:
+        workContext.length > 0
+          ? (Array.from(new Set(workContext)) as WorkContextOption[])
+          : undefined,
       teamSize: (teamSize as TeamSizeOption) || undefined,
-      bottleneck: bottleneck || undefined,
+      repeatingWork: repeatingWork || undefined,
       eventId: eventId || undefined,
       pageUrl: pageUrl || undefined,
       referrer: referrer || undefined,
