@@ -5,7 +5,7 @@ import { MetaViewContent } from "@/components/meta-view-content";
 export const metadata: Metadata = {
   title: "Book a Demo | OVRMN",
   description:
-    "Tell OVRMN a bit about your team and book a tailored demo.",
+    "Tell OVRMN what keeps coming up and book a tailored pilot.",
 };
 
 export default function BookPage() {

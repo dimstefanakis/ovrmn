@@ -60,9 +60,10 @@ export async function POST(request: Request) {
           company_name: validation.data.companyName,
           content_category: "Book demo",
           content_name: "OVRMN book demo",
-          team: validation.data.team || "",
+          workflow: validation.data.workflow || "",
+          work_context: validation.data.workContext?.join(", ") || "",
           team_size: validation.data.teamSize || "",
-          tools: validation.data.tools?.join(", ") || "",
+          repeating_work: validation.data.repeatingWork || "",
         },
         email: validation.data.workEmail,
         eventId,
@@ -78,9 +79,10 @@ export async function POST(request: Request) {
           company_name: validation.data.companyName,
           content_category: "Book demo",
           content_name: "OVRMN book demo completion",
-          team: validation.data.team || "",
+          workflow: validation.data.workflow || "",
+          work_context: validation.data.workContext?.join(", ") || "",
           team_size: validation.data.teamSize || "",
-          tools: validation.data.tools?.join(", ") || "",
+          repeating_work: validation.data.repeatingWork || "",
         },
         email: validation.data.workEmail,
         eventId,
@@ -126,7 +128,7 @@ export async function POST(request: Request) {
         properties: {
           email: validation.data.workEmail,
           company: validation.data.companyName,
-          team: validation.data.team,
+          workflow: validation.data.workflow,
           team_size: validation.data.teamSize,
         },
       });
@@ -134,9 +136,10 @@ export async function POST(request: Request) {
         distinctId: validation.data.workEmail,
         event: "demo_lead_created",
         properties: {
-          team: validation.data.team,
+          workflow: validation.data.workflow,
+          work_context: validation.data.workContext,
           team_size: validation.data.teamSize,
-          tools: validation.data.tools,
+          repeating_work: validation.data.repeatingWork,
           utm_source: attribution.utmSource,
           utm_medium: attribution.utmMedium,
           utm_campaign: attribution.utmCampaign,
@@ -177,10 +180,10 @@ async function writeLeadToAirtable(
   const fields: Record<string, string> = {
     [field.workEmail]: submission.workEmail,
     [field.companyName]: submission.companyName,
-    [field.team]: submission.team || "",
-    [field.tools]: submission.tools?.join(", ") || "",
+    [field.workflow]: submission.workflow || "",
+    [field.workContext]: submission.workContext?.join(", ") || "",
     [field.teamSize]: submission.teamSize || "",
-    [field.bottleneck]: submission.bottleneck || "",
+    [field.repeatingWork]: submission.repeatingWork || "",
     [field.pageUrl]: submission.pageUrl || "",
     [field.landingPath]: attribution.landingPath || "",
     [field.referrer]: attribution.referrer || submission.referrer || "",
@@ -282,13 +285,14 @@ function getMissingAirtableConfig() {
 
 function getAirtableFieldNames() {
   return {
-    workEmail: process.env.AIRTABLE_WORK_EMAIL_FIELD || "Work email",
+    workEmail: process.env.AIRTABLE_WORK_EMAIL_FIELD || "Work Email",
     companyName: process.env.AIRTABLE_COMPANY_NAME_FIELD || "Company name",
-    team: process.env.AIRTABLE_TEAM_FIELD || "First team",
-    tools: process.env.AIRTABLE_TOOLS_FIELD || "Daily tools",
+    workflow: process.env.AIRTABLE_WORKFLOW_FIELD || "Workflow",
+    workContext:
+      process.env.AIRTABLE_WORK_CONTEXT_FIELD || "Where work happens",
     teamSize: process.env.AIRTABLE_TEAM_SIZE_FIELD || "Team size",
-    bottleneck:
-      process.env.AIRTABLE_BOTTLENECK_FIELD || "Operational bottleneck",
+    repeatingWork:
+      process.env.AIRTABLE_REPEATING_WORK_FIELD || "What keeps repeating",
     pageUrl: process.env.AIRTABLE_PAGE_URL_FIELD || "Page URL",
     landingPath: process.env.AIRTABLE_LANDING_PATH_FIELD || "Landing path",
     referrer: process.env.AIRTABLE_REFERRER_FIELD || "Referrer",
