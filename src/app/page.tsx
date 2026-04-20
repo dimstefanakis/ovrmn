@@ -37,6 +37,7 @@ const proofCards = [
 
 export default function Home() {
   const bgPath = "/bg.webp";
+  const heroVideoPath = "/shader-lab-2026-04-20T18-58-13.webm";
   const coastPath = "/coast.webp";
   const portraitPath = "/alexander.webp";
   const roadPath = "/road.webp";
@@ -81,14 +82,18 @@ export default function Home() {
       <section className="relative flex h-screen min-h-[700px] max-h-[900px] flex-col items-center justify-center px-6 md:px-12 overflow-hidden text-center">
         {/* Background Artifacts — Increased visibility */}
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-          <Image
-            src={bgPath}
-            alt="Intelligence Observatory"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover grayscale contrast-110 opacity-80"
-          />
+          <video
+            aria-hidden="true"
+            autoPlay
+            className="h-full w-full object-cover grayscale contrast-110 opacity-80"
+            loop
+            muted
+            playsInline
+            poster={bgPath}
+            preload="auto"
+          >
+            <source src={heroVideoPath} type="video/webm" />
+          </video>
           <div className="absolute inset-0 bg-black/30" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40" />
         </div>
