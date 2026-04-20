@@ -114,13 +114,13 @@ const useCases = [
 ];
 
 export default function TicketsPage() {
-  const bgPath = "/bg.webp";
-  const coastPath = "/coast.webp";
+  const heroVideoPath = "/shader-lab-2026-04-20T18-58-13.webm";
+  const footerVideoPath = "/shader-lab-2026-04-20T22-52-59.webm";
   const portraitPath = "/alexander.webp";
-  const roadPath = "/road.webp";
-  const skyscraperPath = "/skyscraper.webp";
+  const roadPath = "/shader-lab-2026-04-20T22-33-39.webp";
+  const skyscraperPath = "/shader-lab-2026-04-20T22-15-42.webp";
+  const forestPath = "/shader-lab-2026-04-20T22-30-42.webp";
   const supportFlowVideoPath = "/support-flow-web.mp4";
-  const supportFlowPosterPath = "/support-flow-poster.jpg";
 
   return (
     <main className="relative flex min-h-screen flex-col overflow-hidden bg-black selection:bg-white selection:text-black">
@@ -168,14 +168,17 @@ export default function TicketsPage() {
 
       <section className="relative flex h-screen max-h-[900px] min-h-[700px] flex-col items-center justify-center overflow-hidden px-6 text-center md:px-12">
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-          <Image
-            src={bgPath}
-            alt="Intelligence Observatory"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover grayscale contrast-110 opacity-80"
-          />
+          <video
+            aria-hidden="true"
+            autoPlay
+            className="h-full w-full object-cover grayscale contrast-110 opacity-80"
+            loop
+            muted
+            playsInline
+            preload="auto"
+          >
+            <source src={heroVideoPath} type="video/webm" />
+          </video>
           <div className="absolute inset-0 bg-black/30" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40" />
         </div>
@@ -376,9 +379,9 @@ export default function TicketsPage() {
       </section>
 
       <section className="relative flex w-full min-h-[760px] items-center overflow-hidden border-t border-white/[0.05] bg-black px-6 py-32 md:min-h-[820px] md:px-12 md:py-36">
-        <div className="absolute inset-0 z-0 h-full w-full opacity-80">
+        <div className="absolute inset-0 z-0 h-full w-full opacity-90">
           <Image
-            src="/forest.webp"
+            src={forestPath}
             alt="The Forest"
             fill
             sizes="100vw"
@@ -443,7 +446,6 @@ export default function TicketsPage() {
                       loop
                       muted
                       playsInline
-                      poster={supportFlowPosterPath}
                       preload="metadata"
                     >
                       <source src={supportFlowVideoPath} type="video/mp4" />
@@ -509,7 +511,7 @@ export default function TicketsPage() {
             alt="Open road"
             fill
             sizes="100vw"
-            className="object-cover object-center grayscale contrast-125 opacity-80"
+            className="object-cover object-center grayscale contrast-125 opacity-90"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/45 to-black/65" />
           <div className="absolute inset-0 dither-bg opacity-18" />
@@ -558,7 +560,7 @@ export default function TicketsPage() {
             alt="City skyline"
             fill
             sizes="100vw"
-            className="object-cover object-center grayscale contrast-125 opacity-80"
+            className="object-cover object-center grayscale contrast-125 opacity-90"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/45 to-black/65" />
           <div className="absolute inset-0 dither-bg opacity-18" />
@@ -611,15 +613,17 @@ export default function TicketsPage() {
         <div className="mx-auto max-w-7xl">
           <div className="relative overflow-hidden rounded-[8px] border border-white/[0.12] bg-white/[0.04] p-6 md:p-10 lg:p-14">
             <div className="pointer-events-none absolute inset-0 z-0">
-              <Image
-                src={coastPath}
-                alt=""
-                fill
-                sizes="100vw"
-                className="object-cover object-center grayscale opacity-20"
-              />
-              <div className="absolute inset-0 bg-gradient-to-br from-black via-black/82 to-black/55" />
-              <div className="absolute inset-0 dither-bg opacity-20" />
+              <video
+                aria-hidden="true"
+                autoPlay
+                className="h-full w-full object-cover object-center grayscale opacity-90"
+                loop
+                muted
+                playsInline
+                preload="auto"
+              >
+                <source src={footerVideoPath} type="video/webm" />
+              </video>
             </div>
 
             <div className="relative z-10 grid min-h-[560px] content-between gap-16">
