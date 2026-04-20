@@ -143,7 +143,7 @@ export default function Home() {
         {/* Abstract Metadata */}
         <div className="reveal-up absolute bottom-12 left-1/2 -translate-x-1/2 text-center" style={{ animationDelay: "900ms" }}>
           <div className="font-mono text-[9px] tracking-[0.2em] text-white/40 uppercase mb-2">
-            Email / Chat / Slack / Custom
+            From the AI company of Athens
           </div>
           <div className="h-px w-32 bg-white/20 mx-auto" />
         </div>
