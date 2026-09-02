@@ -18,6 +18,7 @@ import {
   trackMetaCompleteRegistration,
   trackMetaLead,
 } from "@/lib/meta-browser";
+import { trackChatGptAdsLead } from "@/lib/chatgpt-ads-browser";
 import posthog from "posthog-js";
 
 type FormState = {
@@ -179,6 +180,7 @@ export function BookDemoFlow() {
         workContext: validation.data.workContext,
         teamSize: validation.data.teamSize,
       });
+      trackChatGptAdsLead(eventId);
       posthog.identify(validation.data.workEmail, {
         email: validation.data.workEmail,
         company: validation.data.companyName,
