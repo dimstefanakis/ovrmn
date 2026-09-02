@@ -8,6 +8,7 @@ import {
   getClientIpAddress,
   sendMetaConversionEvent,
 } from "@/lib/meta-server";
+import { sendChatGptAdsLead } from "@/lib/chatgpt-ads-server";
 import { sendLinkedInConversionEvent } from "@/lib/linkedin-server";
 import { getPostHogClient } from "@/lib/posthog-server";
 
@@ -52,7 +53,7 @@ export async function POST(request: Request) {
 
   const [airtableResult, analyticsResult] = await Promise.allSettled([
     writeLeadToAirtable(validation.data, attribution, eventId),
-    Promise.all([
+    Promise.allSettled([
       sendMetaConversionEvent({
         clientIpAddress,
         clientUserAgent,
@@ -99,12 +100,22 @@ export async function POST(request: Request) {
     ]),
   ]);
 
+  const analyticsResults =
+    analyticsResult.status === "fulfilled" ? analyticsResult.value : [];
+
+  if (analyticsResult.status === "rejected") {
+    console.error("Analytics tracking failed", analyticsResult.reason);
+  }
+
+  analyticsResults.forEach((result, index) => {
+    if (result.status === "rejected") {
+      const integration = ["Meta Lead", "Meta Registration", "LinkedIn"][index];
+      console.error(`${integration || "Analytics"} tracking failed`, result.reason);
+    }
+  });
+
   if (airtableResult.status === "rejected") {
     console.error("Airtable lead write failed", airtableResult.reason);
-
-    if (analyticsResult.status === "rejected") {
-      console.error("Analytics tracking also failed", analyticsResult.reason);
-    }
 
     return Response.json(
       {
@@ -115,8 +126,21 @@ export async function POST(request: Request) {
     );
   }
 
-  if (analyticsResult.status === "rejected") {
-    console.error("Analytics tracking failed", analyticsResult.reason);
+  let chatGptAdsTracked = false;
+
+  try {
+    chatGptAdsTracked = await sendChatGptAdsLead({
+      clientIpAddress,
+      clientUserAgent,
+      email: validation.data.workEmail,
+      eventId,
+      eventSourceUrl:
+        validation.data.pageUrl || new URL("/book", request.url).toString(),
+      obref: cookieStore.get("__obref")?.value,
+      oppref: getOpenAiClickReference(validation.data.pageUrl, cookieStore),
+    });
+  } catch (error) {
+    console.error("ChatGPT Ads tracking failed", error);
   }
 
   const posthog = getPostHogClient();
@@ -151,12 +175,13 @@ export async function POST(request: Request) {
     }
   }
 
-  const [leadTracked, registrationTracked, linkedInTracked] =
-    analyticsResult.status === "fulfilled"
-      ? analyticsResult.value
-      : [false, false, false];
+  const [leadTracked = false, registrationTracked = false, linkedInTracked = false] =
+    analyticsResults.map((result) =>
+      result.status === "fulfilled" ? result.value : false
+    );
 
   return Response.json({
+    chatGptAdsTracked,
     ok: true,
     linkedInTracked,
     metaTracked: leadTracked || registrationTracked,
@@ -314,6 +339,25 @@ function firstError(errors: Record<string, string | undefined>) {
 
 function createServerEventId() {
   return `ovrmn_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+}
+
+function getOpenAiClickReference(
+  pageUrl: string | undefined,
+  cookieStore: Awaited<ReturnType<typeof cookies>>
+) {
+  if (pageUrl) {
+    try {
+      const oppref = new URL(pageUrl).searchParams.get("oppref")?.trim();
+
+      if (oppref) {
+        return oppref;
+      }
+    } catch {
+      // Fall back to the Pixel's first-party attribution cookie.
+    }
+  }
+
+  return cookieStore.get("__oppref")?.value;
 }
 
 function formatFbc(fbclid?: string) {

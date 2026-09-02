@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, IBM_Plex_Mono, Geist } from "next/font/google";
+import Script from "next/script";
 import { LinkedInInsightTag } from "@/components/linkedin-insight-tag";
 import { MetaPixel } from "@/components/meta-pixel";
 import "./globals.css";
@@ -20,6 +21,17 @@ const geist = Geist({
   subsets: ["latin"],
 });
 
+const chatGptPixelDebug = process.env.CHATGPT_PIXEL_DEBUG
+  ? process.env.CHATGPT_PIXEL_DEBUG === "true"
+  : process.env.NODE_ENV !== "production";
+const chatGptPixelId = process.env.CHATGPT_PIXEL_ID?.trim();
+const chatGptPixelConfiguration = chatGptPixelId
+  ? JSON.stringify({
+      pixelId: chatGptPixelId,
+      debug: chatGptPixelDebug,
+    }).replaceAll("<", "\\u003c")
+  : null;
+
 export const metadata: Metadata = {
   title: "OVRMN | Intelligence Observatory",
   description: "Tailored AI agents and bespoke intelligence systems for the modern enterprise.",
@@ -35,6 +47,16 @@ export default function RootLayout({
       lang="en"
       className={`${playfair.variable} ${mono.variable} ${geist.variable} h-full antialiased`}
     >
+      <head>
+        {chatGptPixelConfiguration ? (
+          <Script id="chatgpt-ads-pixel" strategy="beforeInteractive">
+            {`
+              !function(w,d,s,u){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q;var j=d.createElement(s);j.async=1;j.src=u;var f=d.getElementsByTagName(s)[0];f.parentNode.insertBefore(j,f)}(window,document,"script","https://bzrcdn.openai.com/sdk/oaiq.min.js");
+              oaiq("init",${chatGptPixelConfiguration});
+            `}
+          </Script>
+        ) : null}
+      </head>
       <body className="bg-[#050505] text-[#f5f5f5] selection:bg-white selection:text-black">
         {/* Dither Overlay */}
         <div className="pointer-events-none fixed inset-0 z-50 opacity-[0.03] mix-blend-overlay" 
