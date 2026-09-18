@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import localFont from "next/font/local";
 import { EXPLORE_FIRST_TEXT, firstTextSmsUrl } from "./first-text";
 import { Conversation } from "./studio";
@@ -68,9 +69,9 @@ export default function PersonalTrainer() {
         Skip to content
       </a>
       <header className={s.header}>
-        <a href="/" className={s.wordmark} aria-label="OVRMN home">
+        <Link href="/" className={s.wordmark} aria-label="OVRMN home">
           OVRMN
-        </a>
+        </Link>
       </header>
       <main id="main">
         <section className={s.hero} aria-labelledby="hero-title">
