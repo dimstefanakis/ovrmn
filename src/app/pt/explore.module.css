@@ -128,170 +128,65 @@
   flex-direction: column;
   align-items: center;
 }
-.phone {
-  width: 360px;
-  height: 610px;
-  padding: 0 13px;
+.example {
   display: flex;
   flex-direction: column;
-  color: #171717;
-  background: #fbfbfa;
-  border-radius: 51px;
-  border: 7px solid #111;
-  outline: 2px solid #85867f;
+  align-items: center;
+  width: 100%;
+  margin: 0;
+}
+.exampleCaption {
+  width: min(100%, 400px);
+  min-height: 132px;
+  padding: 24px 0 28px;
+  text-align: center;
+}
+.exampleCaption h2 {
+  font-family: var(--ov-sans), Arial, sans-serif;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+}
+.exampleCaption p {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #aeafa8;
+  text-wrap: pretty;
+}
+.phone {
+  width: 380px;
+  max-width: 100%;
+  background: #000;
+  border-radius: 44px;
+  border: 5px solid #111;
+  outline: 1px solid #85867f;
   box-shadow:
-    0 0 0 5px #444641,
-    0 0 0 6px #85878060,
+    0 0 0 3px #444641,
     0 26px 75px #00000055;
   overflow: hidden;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
 }
-.statusBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  min-height: 51px;
-  padding: 8px 15px 0;
-  font-size: 13px;
-  font-weight: 600;
-}
-.statusBar > svg {
-  width: 45px;
-  height: 12px;
-}
-.island {
-  width: 100px;
-  height: 28px;
-  border-radius: 20px;
-  background: #080808;
-  position: absolute;
-  left: 50%;
-  top: 12px;
-  transform: translateX(-50%);
-}
-.contact {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 0 13px;
-  border-bottom: 1px solid #e8e8e5;
-}
-.contact > svg {
-  color: #267cf0;
-}
-.contact > div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-.contact > span {
-  width: 24px;
-}
-.avatar {
-  width: 46px;
-  height: 46px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
-  background: #292e26;
-  color: #eeeae1;
-  font-family: var(--ov-serif), Georgia, serif;
-  font-size: 49px;
-  line-height: 1;
-  padding-bottom: 10px;
-}
-.contact strong {
-  font-weight: 500;
-  font-size: 11px;
-}
-.contact strong span {
-  color: #999;
-  font-size: 14px;
-  margin-left: 2px;
-}
-.messages {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  gap: 9px;
-  padding: 19px 0;
-}
-.messages > p {
-  text-align: center;
-  color: #8d8d90;
-  font-size: 10px;
-  font-weight: 500;
-  margin: 0 0 11px;
-}
-.bubble {
-  max-width: 86%;
-  padding: 11px 13px;
-  font-size: 14px;
-  line-height: 1.35;
-  letter-spacing: -0.015em;
-  border-radius: 18px;
-}
-.outgoing {
-  align-self: flex-end;
-  background: #2482f6;
-  color: white;
-  border-bottom-right-radius: 5px;
-}
-.incoming {
-  align-self: flex-start;
-  background: #e8e8ea;
-  color: #202024;
-  border-bottom-left-radius: 5px;
-}
-.composer {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 19px;
-  color: #939499;
-}
-.composer > span {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex: 1;
-  border: 1px solid #d5d5d7;
-  border-radius: 20px;
-  padding: 6px 6px 6px 12px;
-  font-size: 13px;
-}
-.composer > span svg {
-  border-radius: 50%;
-  background: #b4b5b9;
-  color: white;
-  width: 24px;
-  height: 24px;
-  padding: 3px;
-}
-.homeIndicator {
-  width: 115px;
-  height: 4px;
-  border-radius: 3px;
-  background: #171717;
-  margin: 0 auto 8px;
+.phone img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 .examples {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 4px;
+  max-width: 100%;
   background: #232620;
   border: 1px solid #ffffff09;
   padding: 4px;
-  border-radius: 24px;
-  margin-top: 33px;
+  border-radius: 26px;
 }
 .examples button {
-  border-radius: 20px;
-  padding: 10px 19px;
-  min-height: 40px;
+  cursor: pointer;
+  border-radius: 22px;
+  padding: 10px 16px;
+  min-height: 44px;
   background: transparent;
   color: #aeb1a5;
   font-size: 12px;
@@ -306,11 +201,6 @@
 }
 .examples button:hover:not([aria-pressed="true"]) {
   color: #f5f5ed;
-}
-.exampleNote {
-  font-size: 11px;
-  color: #85897d;
-  margin-top: 17px;
 }
 .details {
   position: relative;
@@ -379,31 +269,12 @@
     margin-top: 48px;
     padding: 0 20px 43px;
   }
-  .phone {
-    width: 326px;
-    height: 589px;
-    max-width: 100%;
-    border-width: 6px;
-    border-radius: 45px;
-    padding: 0 11px;
-  }
-  .bubble {
-    font-size: 13px;
-    padding: 10px 12px;
-  }
   .artwork {
     top: -20px;
     width: 940px;
     height: 650px;
     left: calc(50% - 340px);
     opacity: 0.2;
-  }
-  .examples {
-    margin-top: 28px;
-  }
-  .examples button {
-    padding: 10px 16px;
-    font-size: 12px;
   }
   .details {
     padding: 41px 29px 45px;
@@ -423,6 +294,19 @@
     padding: 26px 24px;
   }
 }
+@media (max-width: 480px) {
+  .examples {
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    max-width: 380px;
+  }
+  .exampleCaption {
+    min-height: 148px;
+  }
+  .phone {
+    border-radius: 36px;
+  }
+}
 @media (max-width: 360px) {
   .heroCopy {
     padding-inline: 17px;
@@ -436,26 +320,6 @@
   }
   .productStage {
     padding-inline: 17px;
-  }
-  .phone {
-    height: 585px;
-    border-radius: 40px;
-    padding-inline: 9px;
-  }
-  .statusBar {
-    padding-inline: 13px;
-  }
-  .statusBar > svg {
-    width: 37px;
-  }
-  .island {
-    width: 83px;
-  }
-  .bubble {
-    max-width: 88%;
-  }
-  .examples button {
-    padding-inline: 14px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

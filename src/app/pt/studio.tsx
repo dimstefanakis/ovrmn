@@ -1,122 +1,88 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
-import { ArrowUp, ChevronLeft, Plus } from "lucide-react";
 import s from "./explore.module.css";
 
 const conversations = [
   {
-    name: "Workouts",
-    messages: [
-      { who: "you", text: "only have 25 mins today. still worth going?" },
-      {
-        who: "trainer",
-        text: "Yes. Goblet squats, rows, push-ups. Three rounds.",
-      },
-      {
-        who: "trainer",
-        text: "Use the weights from last time. Leave a couple of reps in reserve.",
-      },
-      { who: "you", text: "okay, heading there now" },
-      { who: "trainer", text: "Text me when you’re done." },
-    ],
+    name: "Nutrition tracking",
+    file: "meal-photo.png",
+    title: "A photo. A practical next step.",
+    description:
+      "Feedback on what's on your plate, with a clear way to improve the next meal.",
+    alt: "Real iMessage conversation: a meal photo of chicken strips and potatoes, followed by OVRMN suggesting a larger protein serving to support muscle growth.",
   },
   {
-    name: "Food",
-    messages: [
-      { who: "you", text: "late workout tonight. dinner before or after?" },
-      {
-        who: "trainer",
-        text: "When are you training, and when did you last eat?",
-      },
-      { who: "you", text: "8ish. lunch was at 1" },
-      {
-        who: "trainer",
-        text: "Have something easy now. Yogurt and a banana would work, then dinner after.",
-      },
-    ],
+    name: "Form correction",
+    file: "form-feedback.png",
+    title: "See what to change.",
+    description:
+      "A frame from your workout video, paired with an edited illustration of the correction.",
+    alt: "Real iMessage conversation: an original dumbbell-row video frame and an edited illustration with green arrows. OVRMN explains how to keep the shoulder facing the floor and clarifies that the edit is not a rep the user performed.",
   },
   {
-    name: "Check-ins",
-    messages: [
-      { who: "trainer", text: "How did the rows feel today?" },
-      { who: "you", text: "easier. got all 3 sets of 10" },
-      { who: "trainer", text: "Same 12kg as last time?" },
-      { who: "you", text: "yep" },
-      {
-        who: "trainer",
-        text: "Good progress. Let’s aim for one more clean rep next session.",
-      },
-    ],
+    name: "Meal recommendations",
+    file: "food-finds.png",
+    title: "Find something that fits.",
+    description:
+      "Real menu options, with a recommendation that remembers your preferences.",
+    alt: "Real iMessage conversation: OVRMN recommends breakfast options, shares a menu link and browser screenshot, and asks the user to check delivery availability because it could not verify the address.",
+  },
+  {
+    name: "Accountability",
+    file: "check-in.png",
+    title: "A coach who checks in first.",
+    description:
+      "Follows up after training and keeps everyday choices connected to your goal.",
+    alt: "Real iMessage conversation: OVRMN checks in about soreness and the next personal-training session, then points out the missing protein in a potatoes-only lunch.",
   },
 ];
 
-export function Conversation() {
+export function Conversation({ assetBase }: { assetBase: string }) {
   const [active, setActive] = useState(0);
+  const conversation = conversations[active];
+  const src = `${assetBase}/${conversation.file}`;
+
   return (
     <div className={s.demo}>
-      <div className={s.phone} aria-label="Example iMessage conversation">
-        <div className={s.statusBar} aria-hidden="true">
-          <span>9:41</span>
-          <div className={s.island} />
-          <svg viewBox="0 0 48 12" fill="currentColor">
-            <rect x="0" y="8" width="3" height="4" rx=".6" />
-            <rect x="5" y="5" width="3" height="7" rx=".6" />
-            <rect x="10" y="2" width="3" height="10" rx=".6" />
-            <path d="M18 4Q24-1 30 4L28 6Q24 3 20 6ZM21 7Q24 4.5 27 7L24 11Z" />
-            <rect x="34" y="2" width="12" height="8" rx="2" />
-            <rect x="47" y="4" width="1" height="4" rx=".5" />
-          </svg>
-        </div>
-        <div className={s.contact}>
-          <ChevronLeft size={24} aria-hidden="true" />
-          <div>
-            <span className={s.avatar} aria-hidden="true">
-              o
-            </span>
-            <strong>
-              OVRMN <span aria-hidden="true">›</span>
-            </strong>
-          </div>
-          <span />
-        </div>
-        <div className={s.messages} aria-live="polite" aria-atomic="true">
-          <p>iMessage</p>
-          {conversations[active].messages.map((m, i) => (
-            <div
-              key={`${active}-${i}`}
-              className={`${s.bubble} ${m.who === "you" ? s.outgoing : s.incoming}`}
-            >
-              {m.text}
-            </div>
-          ))}
-        </div>
-        <div className={s.composer} aria-hidden="true">
-          <Plus size={22} />
-          <span>
-            iMessage
-            <ArrowUp size={19} />
-          </span>
-        </div>
-        <div className={s.homeIndicator} aria-hidden="true" />
-      </div>
       <div
         className={s.examples}
         role="group"
         aria-label="Conversation examples"
       >
-        {conversations.map((conversation, i) => (
+        {conversations.map((example, i) => (
           <button
-            key={conversation.name}
+            key={example.name}
             type="button"
             aria-pressed={active === i}
             onClick={() => setActive(i)}
           >
-            {conversation.name}
+            {example.name}
           </button>
         ))}
       </div>
-      <p className={s.exampleNote}>Example conversation</p>
+      <figure className={s.example}>
+        <figcaption
+          className={s.exampleCaption}
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <h2>{conversation.title}</h2>
+          <p>{conversation.description}</p>
+        </figcaption>
+        <div className={s.phone}>
+          <Image
+            key={src}
+            src={src}
+            alt={conversation.alt}
+            width={1260}
+            height={2736}
+            sizes="(max-width: 360px) calc(100vw - 44px), (max-width: 420px) calc(100vw - 50px), 370px"
+            loading="eager"
+          />
+        </div>
+      </figure>
     </div>
   );
 }

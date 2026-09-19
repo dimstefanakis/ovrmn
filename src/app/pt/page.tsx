@@ -94,7 +94,7 @@ export default function PersonalTrainer() {
                 sizes="(max-width: 760px) 180vw, 1100px"
               />
             </div>
-            <Conversation />
+            <Conversation assetBase="/pt/examples" />
           </div>
         </section>
         <section
