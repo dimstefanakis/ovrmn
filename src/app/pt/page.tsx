@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import localFont from "next/font/local";
-import { EXPLORE_FIRST_TEXT, firstTextSmsUrl } from "./first-text";
+import { FirstTextLink } from "./first-text-link";
 import { Conversation } from "./studio";
 import s from "./explore.module.css";
 
@@ -34,10 +34,6 @@ export const metadata: Metadata = {
 };
 
 function MessageCTA() {
-  const href = firstTextSmsUrl(
-    process.env.DEMI_PUBLIC_IMESSAGE_NUMBER ?? null,
-    EXPLORE_FIRST_TEXT,
-  );
   const content = (
     <>
       <span className={s.messagesIcon} aria-hidden="true">
@@ -51,14 +47,13 @@ function MessageCTA() {
       Text OVRMN
     </>
   );
-  return href ? (
-    <a href={href} className={s.messageCta}>
+  return (
+    <FirstTextLink
+      number={process.env.DEMI_PUBLIC_IMESSAGE_NUMBER ?? null}
+      className={s.messageCta}
+    >
       {content}
-    </a>
-  ) : (
-    <button type="button" className={s.messageCta} aria-disabled="true">
-      {content}
-    </button>
+    </FirstTextLink>
   );
 }
 

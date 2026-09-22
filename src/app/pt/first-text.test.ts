@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { EXPLORE_FIRST_TEXT, firstTextSmsUrl } from "./first-text";
+import { EXPLORE_FIRST_TEXT, exploreFirstText, firstTextSmsUrl } from "./first-text";
 
 test("pilot CTA opens the approved draft directly", () => {
   assert.equal(
@@ -14,4 +14,16 @@ test("an absent or malformed line stays inert", () => {
     assert.equal(firstTextSmsUrl(number, EXPLORE_FIRST_TEXT), null);
   }
   assert.equal(firstTextSmsUrl("+12053968556", "   "), null);
+});
+
+test("the preferred Greek language selects a Greek draft, everything else stays English", () => {
+  const greek = "Γεια σου OVRMN, πώς μπορείς να με βοηθήσεις;";
+  for (const language of ["el", "el-GR", "el-CY", "EL-gr"]) {
+    assert.equal(exploreFirstText(language), greek);
+    const url = firstTextSmsUrl("+12025550123", exploreFirstText(language))!;
+    assert.equal(decodeURIComponent(url.split("&body=")[1]), greek);
+  }
+  for (const language of [undefined, "", "en", "en-US", "en-GR", "fr-FR", "elv"]) {
+    assert.equal(exploreFirstText(language), EXPLORE_FIRST_TEXT);
+  }
 });
