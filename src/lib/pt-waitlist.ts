@@ -3,7 +3,8 @@ import {
   type CountryCode,
 } from "libphonenumber-js/min";
 
-export const WAITLIST_CONSENT = "pt-waitlist-v1";
+// v2: requesting access is joining. The consent covers coaching and check-ins by text.
+export const WAITLIST_CONSENT = "pt-waitlist-v2";
 export const WAITLIST_UTM_KEYS = [
   "utm_source",
   "utm_medium",
@@ -39,4 +40,15 @@ export function waitlistAttribution(value: unknown): Record<string, string> {
         : [];
     }),
   );
+}
+
+/** The browser's IANA timezone, for check-in timing; null when absent or unknown. */
+export function waitlistTimezone(value: unknown): string | null {
+  if (typeof value !== "string" || !value || value.length > 80) return null;
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: value }).format();
+    return value;
+  } catch {
+    return null;
+  }
 }

@@ -11,6 +11,7 @@ import {
   parsePhoneNumberFromString,
   type CountryCode,
 } from "libphonenumber-js/min";
+import { exploreFirstText, firstTextSmsUrl } from "../pt/first-text";
 import {
   WAITLIST_CONSENT,
   WAITLIST_UTM_KEYS,
@@ -53,7 +54,12 @@ export function WaitlistProvider({
   const [country, setCountry] = useState<CountryCode>("GR");
   const [phone, setPhone] = useState("");
   const [pending, setPending] = useState(false);
-  const [joined, setJoined] = useState(false);
+  // listed: kept on the waitlist; checking → in: a spot was opened for them.
+  const [stage, setStage] = useState<"form" | "listed" | "checking" | "in">(
+    "form",
+  );
+  const [line, setLine] = useState<string | null>(null);
+  const joined = stage !== "form";
   const [error, setError] = useState("");
   const selectedCountry = countries.find(
     (option) => option.country === country,
@@ -81,14 +87,42 @@ export function WaitlistProvider({
             ×
           </button>
           <h2 id="waitlist-title">
-            {joined ? "You’re on the list." : "What’s your number?"}
+            {stage === "in"
+              ? "You’re in."
+              : stage === "checking"
+                ? "Checking for a spot…"
+                : stage === "listed"
+                  ? "You’re on the list."
+                  : "What’s your number?"}
           </h2>
           <p id="waitlist-description" className={s.description}>
-            {joined
-              ? "We’ll text you when your spot is ready."
-              : "We’re opening access to a few people at a time."}
+            {stage === "in"
+              ? "A spot just opened up. Text OVRMN to get started."
+              : stage === "checking"
+                ? "One moment."
+                : stage === "listed"
+                  ? "We’ll text you when your spot is ready."
+                  : "We’re opening access to a few people at a time."}
           </p>
-          {joined ? (
+          {stage === "in" && line ? (
+            <>
+              <a
+                ref={(link) => link?.focus()}
+                className={s.submit}
+                href={
+                  firstTextSmsUrl(line, exploreFirstText(navigator.language)) ??
+                  undefined
+                }
+              >
+                Text OVRMN
+              </a>
+              <p className={s.consent}>
+                Or text{" "}
+                {parsePhoneNumberFromString(line)?.formatInternational() ?? line}{" "}
+                from your iPhone.
+              </p>
+            </>
+          ) : stage === "checking" ? null : joined ? (
             <button
               ref={(button) => button?.focus()}
               type="button"
@@ -119,6 +153,8 @@ export function WaitlistProvider({
                     body: JSON.stringify({
                       phone: normalized,
                       consent: WAITLIST_CONSENT,
+                      timezone:
+                        Intl.DateTimeFormat().resolvedOptions().timeZone,
                       website: new FormData(event.currentTarget).get("website"),
                       attribution: Object.fromEntries(
                         WAITLIST_UTM_KEYS.map((key) => [key, query.get(key)]),
@@ -139,8 +175,13 @@ export function WaitlistProvider({
                   const result = await response.json();
                   if (result?.ok !== true)
                     throw new Error("signup_not_confirmed");
-                  setJoined(true);
                   setPhone("");
+                  if (typeof result.number === "string") {
+                    // A beat of suspense before the spot opens.
+                    setLine(result.number);
+                    setStage("checking");
+                    setTimeout(() => setStage("in"), 1400);
+                  } else setStage("listed");
                 } catch {
                   setError("Couldn’t confirm your request. Please try again.");
                 } finally {
@@ -233,8 +274,9 @@ export function WaitlistProvider({
                 {pending ? "Requesting…" : "Request access"}
               </button>
               <p id="waitlist-consent" className={s.consent}>
-                By requesting access, you agree to a text when your spot is
-                ready.
+                By requesting access, you confirm you’re 18+ and want
+                training, food guidance and check-ins by text from OVRMN, an
+                AI coach. You can stop check-ins anytime.
               </p>
             </form>
           )}

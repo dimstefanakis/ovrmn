@@ -3,6 +3,7 @@ import {
   WAITLIST_CONSENT,
   normalizeWaitlistPhone,
   waitlistAttribution,
+  waitlistTimezone,
 } from "@/lib/pt-waitlist";
 
 export const runtime = "nodejs";
@@ -18,6 +19,36 @@ const reply = (body: object, status = 200) =>
       ...(status === 429 ? { "Retry-After": "900" } : {}),
     },
   });
+
+/** Signing up is joining: the coach's backend registers the person with Photon's pool
+ * and answers with the number they text. Null keeps them on the waitlist instead. */
+async function admit(phone: string, timezone: string | null) {
+  const origin = process.env.DEMI_API_URL;
+  const secret = process.env.DEMI_ENROLLMENT_KEY;
+  if (!origin || !secret || !timezone) return null;
+  try {
+    const response = await fetch(new URL("/enroll", origin), {
+      method: "POST",
+      redirect: "error",
+      cache: "no-store",
+      headers: {
+        Authorization: `Bearer ${secret}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ phone, timezone, consent: true, provider: "photon" }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!response.ok) return null;
+    const body = await response.json();
+    return body?.phone === phone &&
+      typeof body?.number === "string" &&
+      /^\+[1-9]\d{7,14}$/.test(body.number)
+      ? (body.number as string)
+      : null;
+  } catch {
+    return null;
+  }
+}
 
 export async function POST(request: Request) {
   // Next's internal URL can be localhost behind a proxy. Host is the public
@@ -127,7 +158,8 @@ export async function POST(request: Request) {
       saved.records[0]?.fields?.Phone !== phone
     )
       return reply({ error: "unavailable" }, 503);
-    return reply({ ok: true });
+    const number = await admit(phone, waitlistTimezone(body.timezone));
+    return reply(number ? { ok: true, number } : { ok: true });
   } catch {
     return reply({ error: "unavailable" }, 503);
   }

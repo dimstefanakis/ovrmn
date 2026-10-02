@@ -16,6 +16,8 @@ const envKeys = [
   "AIRTABLE_API_KEY",
   "AIRTABLE_WAITLIST_API_KEY",
   "AIRTABLE_TABLE_NAME",
+  "DEMI_API_URL",
+  "DEMI_ENROLLMENT_KEY",
 ] as const;
 const originalEnv = Object.fromEntries(
   envKeys.map((key) => [key, process.env[key]]),
@@ -28,6 +30,8 @@ afterEach(() => {
   }
 });
 function setup() {
+  delete process.env.DEMI_API_URL;
+  delete process.env.DEMI_ENROLLMENT_KEY;
   delete process.env.AIRTABLE_WAITLIST_API_KEY;
   delete process.env.AIRTABLE_WAITLIST_BASE_ID;
   process.env.AIRTABLE_BASE_ID = "appTest";
@@ -308,4 +312,54 @@ test("repeated attempts are bounded before making another storage call", async (
   assert.equal(response.status, 429);
   assert.equal(response.headers.get("retry-after"), "900");
   assert.equal(calls, 30);
+});
+
+test("signing up is joining: the coach's backend registers the number with Photon and answers with the line to text", async () => {
+  setup();
+  process.env.DEMI_API_URL = "https://api.ovrmn.test";
+  process.env.DEMI_ENROLLMENT_KEY = "enroll_test_only";
+  const enrollments: unknown[] = [];
+  stubFetch(async (url, init) => {
+    if (String(url).startsWith("https://api.airtable.com")) return saved();
+    assert.equal(String(url), "https://api.ovrmn.test/enroll");
+    assert.equal(new Headers(init?.headers).get("authorization"), "Bearer enroll_test_only");
+    enrollments.push(JSON.parse(String(init?.body)));
+    return Response.json({ phone: "+12025550123", number: "+14155550100" });
+  });
+  const response = await POST(
+    request({ phone: "+1 (202) 555-0123", consent: WAITLIST_CONSENT, timezone: "America/New_York" }),
+  );
+  assert.deepEqual(await response.json(), { ok: true, number: "+14155550100" });
+  assert.deepEqual(enrollments, [
+    { phone: "+12025550123", timezone: "America/New_York", consent: true, provider: "photon" },
+  ]);
+});
+
+test("without a confirmed spot the person stays on the waitlist, and nothing private leaks", async () => {
+  setup();
+  process.env.DEMI_API_URL = "https://api.ovrmn.test";
+  process.env.DEMI_ENROLLMENT_KEY = "enroll_test_only";
+  for (const answer of [
+    new Response("private backend details", { status: 503 }),
+    Response.json({ phone: "+12025550124", number: "+14155550100" }),
+    Response.json({ phone: "+12025550123", number: "call us" }),
+    new Response("not json", { status: 200 }),
+  ]) {
+    stubFetch(async (url) => (String(url).startsWith("https://api.airtable.com") ? saved() : answer));
+    const response = await POST(request({ phone: "+12025550123", consent: WAITLIST_CONSENT, timezone: "Europe/Athens" }));
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { ok: true });
+  }
+  let backend = 0;
+  stubFetch(async (url) => {
+    if (String(url).startsWith("https://api.airtable.com")) return saved();
+    backend++;
+    return Response.json({ phone: "+12025550123", number: "+14155550100" });
+  });
+  for (const timezone of [undefined, "Mars/Olympus", "x".repeat(81)])
+    assert.deepEqual(
+      await (await POST(request({ phone: "+12025550123", consent: WAITLIST_CONSENT, timezone }))).json(),
+      { ok: true },
+    );
+  assert.equal(backend, 0);
 });

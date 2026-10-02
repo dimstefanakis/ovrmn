@@ -145,6 +145,12 @@
 .submit:hover {
   background: #e1e1db;
 }
+/* "Text OVRMN" is a link styled as the button. */
+a.submit {
+  box-sizing: border-box;
+  text-align: center;
+  text-decoration: none;
+}
 .submit:disabled {
   opacity: 0.65;
   cursor: wait;
