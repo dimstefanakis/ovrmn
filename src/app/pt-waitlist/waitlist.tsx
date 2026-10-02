@@ -253,7 +253,7 @@ export function WaitlistProvider({
                   required
                   disabled={pending}
                   aria-invalid={Boolean(error)}
-                  aria-describedby="waitlist-error waitlist-consent"
+                  aria-describedby="waitlist-error"
                 />
               </div>
               <div className={s.honeypot} aria-hidden="true">
@@ -273,11 +273,6 @@ export function WaitlistProvider({
               <button type="submit" className={s.submit} disabled={pending}>
                 {pending ? "Requesting…" : "Request access"}
               </button>
-              <p id="waitlist-consent" className={s.consent}>
-                By requesting access, you confirm you’re 18+ and want
-                training, food guidance and check-ins by text from OVRMN, an
-                AI coach. You can stop check-ins anytime.
-              </p>
             </form>
           )}
         </div>

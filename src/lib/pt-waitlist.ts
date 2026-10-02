@@ -3,7 +3,7 @@ import {
   type CountryCode,
 } from "libphonenumber-js/min";
 
-// v2: requesting access is joining. The consent covers coaching and check-ins by text.
+// v2: requesting access is joining, with no consent line on the page.
 export const WAITLIST_CONSENT = "pt-waitlist-v2";
 export const WAITLIST_UTM_KEYS = [
   "utm_source",
