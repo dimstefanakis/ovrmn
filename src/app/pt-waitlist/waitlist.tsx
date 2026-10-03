@@ -14,6 +14,7 @@ import {
 import { exploreFirstText, firstTextSmsUrl } from "../pt/first-text";
 import {
   WAITLIST_CONSENT,
+  WAITLIST_REQUEST_TIMEOUT_MS,
   WAITLIST_UTM_KEYS,
   normalizeWaitlistPhone,
 } from "@/lib/pt-waitlist";
@@ -160,7 +161,7 @@ export function WaitlistProvider({
                         WAITLIST_UTM_KEYS.map((key) => [key, query.get(key)]),
                       ),
                     }),
-                    signal: AbortSignal.timeout(15_000),
+                    signal: AbortSignal.timeout(WAITLIST_REQUEST_TIMEOUT_MS),
                   });
                   if (!response.ok) {
                     setError(

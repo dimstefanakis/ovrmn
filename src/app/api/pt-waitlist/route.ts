@@ -1,12 +1,15 @@
 import { createHmac } from "node:crypto";
 import {
   WAITLIST_CONSENT,
+  WAITLIST_SAVE_TIMEOUT_MS,
+  WAITLIST_ENROLL_TIMEOUT_MS,
   normalizeWaitlistPhone,
   waitlistAttribution,
   waitlistTimezone,
 } from "@/lib/pt-waitlist";
 
 export const runtime = "nodejs";
+export const maxDuration = 30;
 
 // Best-effort, bounded per-instance protection, not a distributed rate limit or
 // phone ownership check. No raw IPs, phone numbers or provider errors are logged.
@@ -36,7 +39,7 @@ async function admit(phone: string, timezone: string | null) {
         "content-type": "application/json",
       },
       body: JSON.stringify({ phone, timezone, consent: true, provider: "photon" }),
-      signal: AbortSignal.timeout(15_000),
+      signal: AbortSignal.timeout(WAITLIST_ENROLL_TIMEOUT_MS),
     });
     if (!response.ok) return null;
     const body = await response.json();
@@ -144,7 +147,7 @@ export async function POST(request: Request) {
             },
           ],
         }),
-        signal: AbortSignal.timeout(10_000),
+        signal: AbortSignal.timeout(WAITLIST_SAVE_TIMEOUT_MS),
       },
     );
     // One upsert, not a race-prone read-then-create. Rejoining updates supplied

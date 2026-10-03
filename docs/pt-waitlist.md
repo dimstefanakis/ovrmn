@@ -1,6 +1,6 @@
 # PT waitlist
 
-`/pt-waitlist` shares the `/pt` landing page, but both **Text OVRMN** buttons open a phone-only waitlist dialog. `/pt` still opens iMessage. This flow never enrolls a Linq contact or sends a message.
+`/pt-waitlist` shares the `/pt` landing page, but both **Text OVRMN** buttons open a phone-only access dialog. The request is saved to Airtable, then the backend registers the person with Photon's shared pool and returns their assigned number. They tap **Text OVRMN** to open a draft and send the first message themselves. `/pt` keeps its existing direct iMessage link. This flow does not enroll a Linq contact or send a message.
 
 ## Airtable setup
 
@@ -28,15 +28,23 @@ For the existing OVRMN base, reuse `AIRTABLE_API_KEY` and `AIRTABLE_BASE_ID` and
 
 Schema inspection/creation additionally requires `schema.bases:read` / `schema.bases:write`. Runtime does not need schema access. Never put the token in a public environment variable or paste it into chat.
 
+Instant access additionally requires these server-only production variables:
+
+- `DEMI_API_URL`: the deployed coach API origin, currently `https://35.207.114.37`.
+- `DEMI_ENROLLMENT_KEY`: the website enrollment bearer secret, stored as a Vercel Secret. It must match the backend. Never expose it in a `NEXT_PUBLIC_` variable.
+
+Enrollment calls `POST /enroll` with `{ phone, timezone, consent: true, provider: "photon" }`. Success must echo the submitted phone and a valid E.164 `number`. The backend is idempotent for an existing user and does not change their preferences or timezone. A real inbound message starts coaching, not the web form.
+
 ## Behavior
 
 - Native country picker (Greece initially), flag, calling code and country-specific mobile example. The client accepts national numbers using the selected country; a full international number switches the picker automatically. The server still requires a normalized international number. No OTP: ownership is **not verified**.
-- The action is **Request access**, followed by a saved-request confirmation. This does not imply immediate access. Country names/examples are generated server-side and serialized to avoid differences between browser and server locale data.
+- The action is **Request access**. Confirmed enrollment shows **You’re in** and the assigned iMessage line. The draft is Greek on Greek-language devices, English otherwise. If enrollment is unavailable or the browser has no valid timezone, the saved request stays on the waitlist. Country names/examples are generated server-side and serialized to avoid differences between browser and server locale data.
 - A single Airtable PATCH with `performUpsert.fieldsToMergeOn: ["Phone"]` handles repeated submissions. Supplied campaign tags are latest-touch; omitted tags and Airtable's original created time are preserved. Manually introducing duplicate Phone rows causes Airtable to reject ambiguous upserts rather than claim success.
 - Confirm only after Airtable returns the expected saved record. A retry after a lost response targets the same normalized Phone.
-- Store only the phone, consent version, fixed source path and five bounded UTM tags. Do not emit a new ad conversion or pass the phone to analytics. Existing site-wide analytics are unchanged.
+- Store only the phone, consent version (`pt-waitlist-v2`), fixed source path and five bounded UTM tags in Airtable. The browser timezone goes to the coach backend for new-user check-in timing. Do not emit a new ad conversion or pass the phone to analytics. Existing site-wide analytics are unchanged.
 - Same-origin requests, 4 KB body limit, honeypot and bounded per-instance throttling (30 attempts / 15 minutes / IP hash). This is basic abuse resistance, not a distributed limiter or proof of human/phone ownership. Airtable throttling fails safely; there is no durable background signup queue.
-- Notification when a spot opens is manual; this change does not implement outbound automation.
+- Airtable has a 10-second deadline, followed by a 15-second enrollment deadline. The route allows 30 seconds and the browser waits up to 35 seconds, so it cannot time out before the server finishes its normal work.
+- For waitlisted requests without confirmed enrollment, follow-up remains manual; this change does not implement outbound automation.
 
 ## Verification
 

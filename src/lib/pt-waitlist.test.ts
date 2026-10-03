@@ -3,9 +3,12 @@ import assert from "node:assert/strict";
 import {
   normalizeWaitlistPhone,
   WAITLIST_CONSENT,
+  WAITLIST_SAVE_TIMEOUT_MS,
+  WAITLIST_ENROLL_TIMEOUT_MS,
+  WAITLIST_REQUEST_TIMEOUT_MS,
   waitlistAttribution,
 } from "./pt-waitlist";
-import { POST } from "../app/api/pt-waitlist/route";
+import { POST, maxDuration } from "../app/api/pt-waitlist/route";
 import { phoneCountries } from "../app/pt-waitlist/phone-countries";
 
 const originalFetch = globalThis.fetch;
@@ -82,6 +85,11 @@ test("phone normalization accepts international formatting, not guessed country 
     "+1".repeat(30),
   ])
     assert.equal(normalizeWaitlistPhone(value), null);
+});
+
+test("browser and hosting deadlines allow the sequential save and enrollment to finish", () => {
+  assert.ok(maxDuration * 1000 > WAITLIST_SAVE_TIMEOUT_MS + WAITLIST_ENROLL_TIMEOUT_MS);
+  assert.ok(WAITLIST_REQUEST_TIMEOUT_MS > maxDuration * 1000);
 });
 
 test("country selection normalizes local numbers and preserves explicit international numbers", () => {
@@ -333,6 +341,30 @@ test("signing up is joining: the coach's backend registers the number with Photo
   assert.deepEqual(enrollments, [
     { phone: "+12025550123", timezone: "America/New_York", consent: true, provider: "photon" },
   ]);
+});
+
+test("enrollment only runs after storage confirms the exact phone; retries use the same normalized identity", async () => {
+  setup();
+  process.env.DEMI_API_URL = "https://api.ovrmn.test";
+  process.env.DEMI_ENROLLMENT_KEY = "enroll_test_only";
+  const enrollments: string[] = [];
+  let storageAvailable = false;
+  stubFetch(async (url, init) => {
+    if (String(url).startsWith("https://api.airtable.com"))
+      return storageAvailable ? saved() : new Response("storage unavailable", { status: 503 });
+    const payload = JSON.parse(String(init?.body));
+    enrollments.push(payload.phone);
+    assert.equal(init?.redirect, "error");
+    assert.equal(init?.cache, "no-store");
+    return Response.json({ phone: payload.phone, number: "+14155550100" });
+  });
+  const signup = (phone: string) => request({ phone, consent: WAITLIST_CONSENT, timezone: "Europe/Athens" });
+  assert.equal((await POST(signup("+12025550123"))).status, 503);
+  assert.equal(enrollments.length, 0);
+  storageAvailable = true;
+  for (const phone of ["+1 (202) 555-0123", "0012025550123"])
+    assert.deepEqual(await (await POST(signup(phone))).json(), { ok: true, number: "+14155550100" });
+  assert.deepEqual(enrollments, ["+12025550123", "+12025550123"]);
 });
 
 test("without a confirmed spot the person stays on the waitlist, and nothing private leaks", async () => {

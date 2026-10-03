@@ -5,6 +5,11 @@ import {
 
 // v2: requesting access is joining, with no consent line on the page.
 export const WAITLIST_CONSENT = "pt-waitlist-v2";
+// Saving and enrollment are sequential. The browser must outlive both calls.
+export const WAITLIST_SAVE_TIMEOUT_MS = 10_000;
+export const WAITLIST_ENROLL_TIMEOUT_MS = 15_000;
+export const WAITLIST_REQUEST_TIMEOUT_MS =
+  WAITLIST_SAVE_TIMEOUT_MS + WAITLIST_ENROLL_TIMEOUT_MS + 10_000;
 export const WAITLIST_UTM_KEYS = [
   "utm_source",
   "utm_medium",
