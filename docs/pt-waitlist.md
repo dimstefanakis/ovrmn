@@ -54,6 +54,16 @@ Provider tests mock Airtable, including duplicate upsert payloads and provider f
 
 API contract: [Airtable upserts](https://airtable.com/developers/web/api/update-multiple-records).
 
+### Production release: October 3, 2026
+
+- Source `7465857` on `pt-waitlist-instant`, committed and pushed. Deployed to the existing Vercel project `team-rockets-team/ovrmn`, then promoted after verification. Deployment: `dpl_HeXbaMmq8sj7GJuFBFBDUGMuuHER` (`ovrmn-qibltsx2i-team-rockets-team.vercel.app`). Public page: `https://www.ovrmn.com/pt-waitlist`.
+- Production `DEMI_API_URL` and `DEMI_ENROLLMENT_KEY` configured server-side. An authenticated invalid-payload request to the coach API returns 400, verifying the private key without enrolling anyone.
+- 18 focused tests, TypeScript, scoped ESLint, local production build and Vercel build passed. Tests cover exact-phone response validation, idempotent retry identity, storage-before-enrollment, failure fallback, validation and timeout budgets.
+- Browser checks on the built source used a local-only response fixture: checking/success with the assigned-line SMS draft, invalid-number feedback, retry after failure with number retained, and saved-waitlist fallback. These are **mocked provider checks**, not live enrollment acceptance.
+- After promotion, `/`, `/pt` and `/pt-waitlist` return 200; the public signup route rejects invalid details with 400 and cross-origin requests with 403. Live desktop/mobile form opens with Greece, flag/calling code and the country-specific placeholder; the 390px form has no horizontal overflow.
+- No real signup was submitted, no Airtable rows or Photon contacts were created for QA, and no texts were sent. First real registration is still the final provider acceptance check.
+- Rollback: promote the previous production deployment `dpl_2JodGkEoQdyJzKSCskkEzSVuXZhZ` (`ovrmn-d3udvll0r-team-rockets-team.vercel.app`, source `1ab4ffa`). The added server variables are unused by that older code.
+
 ### Verified 2026-09-23 (not deployed)
 
 - Created `PT` in the existing OVRMN base: `appYWOqZ5dffRvdRY` / `tblmACYnfO0gUxHbR`.
