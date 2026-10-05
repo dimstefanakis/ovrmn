@@ -1,3 +1,5 @@
+import { analyticsAllowedInBrowser } from "@/lib/analytics-privacy";
+
 declare global {
   interface Window {
     oaiq?: (...args: unknown[]) => void;
@@ -9,7 +11,7 @@ export function trackChatGptAdsLead(eventId: string) {
 
   if (
     !normalizedEventId ||
-    typeof window === "undefined" ||
+    !analyticsAllowedInBrowser() ||
     typeof window.oaiq !== "function"
   ) {
     return false;

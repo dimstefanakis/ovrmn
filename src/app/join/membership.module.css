@@ -1,0 +1,78 @@
+/* The OVRMN house look (as on the homepage and files.ovrmn.com): near-black ground on the faint 40px
+   grid, bone type, graphite for the rest; Playfair headlines with a grey italic second line, IBM Plex
+   Mono captions, Geist for sentences. Fonts come from the root layout's variables. */
+:global(html):has(.world), :global(body):has(.world), .world { background-color: #050505; }
+.world {
+  position: relative; min-height: 100dvh; display: flex; flex-direction: column;
+  color: #f2f1ed; font-family: var(--font-sans), "Helvetica Neue", Arial, sans-serif;
+  background-image: linear-gradient(to right, #0e0e0d 1px, transparent 1px), linear-gradient(to bottom, #0e0e0d 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.header { padding: 28px 24px 0; display: flex; justify-content: center; }
+.wordmark {
+  font-family: var(--font-mono), ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 500;
+  letter-spacing: .32em; text-transform: uppercase; text-decoration: none; color: #f2f1ed;
+}
+.main { flex: 1; width: min(100%, 540px); margin: 0 auto; padding: 72px 24px 64px; }
+.kicker {
+  margin: 0 0 22px; font-family: var(--font-mono), ui-monospace, Menlo, monospace; font-size: 11px;
+  letter-spacing: .24em; text-transform: uppercase; color: #8b8a85;
+}
+.main h1 {
+  margin: 0; font-family: var(--font-serif), Georgia, serif; font-weight: 400;
+  font-size: clamp(44px, 9vw, 64px); line-height: 1.04; letter-spacing: -.015em; text-wrap: balance;
+}
+.main h1 em { display: block; font-style: italic; color: #8b8a85; }
+.description { margin: 24px 0 0; max-width: 40ch; font-size: 16px; line-height: 1.65; color: #8b8a85; text-wrap: pretty; }
+.priceRow {
+  margin: 40px 0 0; padding: 22px 0; display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+  border-top: 1px solid #1f1f1d; border-bottom: 1px solid #1f1f1d;
+}
+.price { margin: 0; font-family: var(--font-serif), Georgia, serif; font-size: 44px; line-height: 1; }
+.price span {
+  margin-left: 8px; font-family: var(--font-mono), ui-monospace, Menlo, monospace; font-size: 12px;
+  letter-spacing: .18em; text-transform: uppercase; color: #8b8a85;
+}
+.renewal {
+  margin: 0; font-family: var(--font-mono), ui-monospace, Menlo, monospace; font-size: 11px; line-height: 1.7;
+  letter-spacing: .14em; text-transform: uppercase; color: #8b8a85;
+}
+.priceRow .renewal { text-align: right; max-width: 22ch; }
+.button {
+  margin-top: 32px; display: inline-flex; width: 100%; min-height: 56px; padding: 16px 24px;
+  justify-content: center; align-items: center; border: 1px solid #f2f1ed; border-radius: 0;
+  color: #050505; background: #f2f1ed; cursor: pointer; text-decoration: none;
+  font-family: var(--font-mono), ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 500;
+  letter-spacing: .24em; text-transform: uppercase; transition: background-color .2s ease, color .2s ease;
+}
+.button:hover { background: transparent; color: #f2f1ed; }
+.button:disabled { opacity: .6; cursor: wait; }
+.world a:focus-visible, .world button:focus-visible { outline: 1px solid #f2f1ed; outline-offset: 5px; }
+.note { margin: 18px 0 0; color: #8b8a85; font-size: 12px; line-height: 1.65; }
+.error { margin: 24px 0 0; padding: 14px 16px; border: 1px solid #3a3936; color: #f2f1ed; font-size: 14px; line-height: 1.6; }
+.footer {
+  padding: 24px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px 24px;
+  border-top: 1px solid #1f1f1d; color: #8b8a85;
+  font-family: var(--font-mono), ui-monospace, Menlo, monospace; font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase;
+}
+.footer nav { display: flex; flex-wrap: wrap; gap: 14px 22px; }
+.footer a { color: #8b8a85; text-decoration: none; }
+.footer a:hover { color: #f2f1ed; }
+.policy h1 { font-size: clamp(38px, 7vw, 52px); }
+.policy h2 {
+  margin: 40px 0 10px; font-family: var(--font-mono), ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 500;
+  letter-spacing: .22em; text-transform: uppercase; color: #f2f1ed;
+}
+.policy p, .policy li { font-size: 15px; line-height: 1.8; color: #a3a29d; }
+.policy p { margin: 14px 0; }
+.policy ul { margin: 10px 0; padding-left: 20px; }
+.policy a { color: #f2f1ed; }
+.updated {
+  margin: 18px 0 0; font-family: var(--font-mono), ui-monospace, Menlo, monospace; font-size: 11px;
+  letter-spacing: .14em; text-transform: uppercase; color: #5a5a5a;
+}
+@media (max-width: 380px) {
+  .main { padding: 56px 20px 48px; }
+  .priceRow { flex-direction: column; gap: 10px; }
+  .priceRow .renewal { text-align: left; }
+}

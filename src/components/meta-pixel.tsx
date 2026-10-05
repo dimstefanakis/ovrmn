@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Script from "next/script";
 import { getMetaPixelId, rememberAttributionFromBrowser } from "@/lib/meta-browser";
+import { isPrivateJoinPath } from "@/lib/analytics-privacy";
 
 export function MetaPixel() {
   const pathname = usePathname();
@@ -12,6 +13,10 @@ export function MetaPixel() {
   const pixelId = getMetaPixelId();
 
   useEffect(() => {
+    if (isPrivateJoinPath(pathname)) {
+      lastPathname.current = pathname;
+      return;
+    }
     rememberAttributionFromBrowser();
 
     if (
@@ -25,7 +30,7 @@ export function MetaPixel() {
     lastPathname.current = pathname;
   }, [pathname]);
 
-  if (!pixelId) {
+  if (!pixelId || isPrivateJoinPath(pathname)) {
     return null;
   }
 
@@ -33,6 +38,7 @@ export function MetaPixel() {
     <>
       <Script id="meta-pixel" strategy="afterInteractive">
         {`
+          if (!/^\\/join(?:\\/|$)/.test(window.location.pathname)) {
           !function(f,b,e,v,n,t,s)
           {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
           n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -43,6 +49,7 @@ export function MetaPixel() {
           'https://connect.facebook.net/en_US/fbevents.js');
           fbq('init', '${pixelId}');
           fbq('track', 'PageView');
+          }
         `}
       </Script>
       <noscript>
