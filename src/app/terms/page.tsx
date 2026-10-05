@@ -29,7 +29,7 @@ export default function TermsPage() {
     <p>Cancel anytime from the billing portal (ask OVRMN in Messages for the link) or by emailing <a href="mailto:support@ovrmn.com">support@ovrmn.com</a>. Cancelling stops future payments; you keep access until the end of the month you have paid for.</p>
 
     <h2>No refunds</h2>
-    <p>Payments are non-refundable, including for a month you only partly use. Your membership starts as soon as you subscribe, at your request. See <a href="/refunds">Cancellation &amp; refunds</a>.</p>
+    <p>Payments are non-refundable, including for a month you only partly use. Your membership starts as soon as you subscribe, at your request. See <a href="/refunds">Cancellation</a>.</p>
 
     <h2>Using OVRMN fairly</h2>
     <p>Don&apos;t use OVRMN to harm anyone, to break the law, or to try to break, overload or misuse the service. We may pause or end access if you do.</p>

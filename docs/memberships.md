@@ -23,7 +23,7 @@ Hosting request/access logs may still contain the original incoming path. Config
 
 ## Policies
 
-Confirmed facts: AI personal training in Messages; first seven days from the first message free without a card; $29/month including tax, monthly renewal, cancel anytime; payments are non-refundable; payment review on Stripe; support through the existing Messages conversation or support@ovrmn.com; a secure billing portal for members. `/terms`, `/privacy`, `/refunds` and `/contact` state only these facts. Terms keep a general line that consumer rights the law doesn't allow us to limit still apply.
+Confirmed facts: AI personal training in Messages; first seven days from the first message free without a card; $29/month including tax, monthly renewal, cancel anytime; payments are non-refundable, stated in the Terms only (no refund language on other pages, at Checkout or from the coach); payment review on Stripe; support through the existing Messages conversation or support@ovrmn.com; a secure billing portal for members. `/terms`, `/privacy`, `/refunds` and `/contact` state only these facts. Terms keep a general line that consumer rights the law doesn't allow us to limit still apply.
 
 The configured portal cancels at the end of the paid period. Joining during the free week never charges before its end; Stripe's minimum trial window can extend the first charge when joining near that boundary. Checkout displays its actual charge date.
 

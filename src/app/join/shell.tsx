@@ -12,7 +12,7 @@ export function MembershipShell({ children }: { children: React.ReactNode }) {
           <a href="/contact">Contact</a>
           <a href="/terms">Terms</a>
           <a href="/privacy">Privacy</a>
-          <a href="/refunds">Cancellation & refunds</a>
+          <a href="/refunds">Cancellation</a>
         </nav>
       </footer>
     </div>
