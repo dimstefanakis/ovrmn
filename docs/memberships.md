@@ -1,6 +1,6 @@
 # Membership website — implementation and release draft
 
-Not deployed. Confirmed by the operator: OVRMN branding, support@ovrmn.com, and a final tax-inclusive price of $29/month. Terms/Contact identify ELITE STUCK SINGLE MEMBER P.C., CHARAS 27, 14122 ATHENS, Greece, verified in the intended Stripe account. Refund/withdrawal policy and the appropriate Stripe invoice/tax treatment still need final launch review. Do not invent VAT handling or a refund promise.
+Not deployed. Confirmed by the operator: OVRMN branding, support@ovrmn.com, a final tax-inclusive price of $29/month, and no refunds. Only `/terms` names the company (ELITE STUCK SINGLE MEMBER P.C., GEMI and VAT numbers); other public pages carry no company details, by the operator's choice. Stripe Tax collects VAT inside the price (Greek registration, EU small-seller option).
 
 ## Website contract
 
@@ -21,11 +21,11 @@ Before initialization, the private path excludes PostHog, Meta, LinkedIn and Cha
 
 Hosting request/access logs may still contain the original incoming path. Configure hosting log access and retention accordingly; application code does not log it.
 
-## Policy draft to finish before release
+## Policies
 
-Confirmed facts: AI personal training in Messages; first seven days from the first message free without a card; $29/month including tax, monthly renewal, cancel anytime; payment review on Stripe; support through the existing Messages conversation or support@ovrmn.com; a secure billing portal for members. `/terms`, `/refunds` and `/contact` contain only those facts and neutral support instructions. They make no refund guarantee or exclusion of statutory rights.
+Confirmed facts: AI personal training in Messages; first seven days from the first message free without a card; $29/month including tax, monthly renewal, cancel anytime; payments are non-refundable; payment review on Stripe; support through the existing Messages conversation or support@ovrmn.com; a secure billing portal for members. `/terms`, `/privacy`, `/refunds` and `/contact` state only these facts. Terms keep a general line that consumer rights the law doesn't allow us to limit still apply.
 
-The legal seller and business/contact address are now supplied from the intended Stripe account. The price is inclusive; the configured portal cancels at the end of the paid period. Joining during the free week never charges before its end; Stripe's minimum trial window can extend the first charge when joining near that boundary. Checkout displays its actual charge date. Pending launch review: tax treatment, refund/withdrawal rights and request process, policy acceptance wording and final policy effective date. Draft no unsupported claim about these.
+The configured portal cancels at the end of the paid period. Joining during the free week never charges before its end; Stripe's minimum trial window can extend the first charge when joining near that boundary. Checkout displays its actual charge date.
 
 ## Verification
 

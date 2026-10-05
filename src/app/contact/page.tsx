@@ -10,7 +10,6 @@ export default function ContactPage() {
     <h1>We&apos;re in<br /><em>Messages.</em></h1>
     <p>For membership, payment, cancellation or coaching questions, reply in your existing conversation with OVRMN or email <a href="mailto:support@ovrmn.com">support@ovrmn.com</a>.</p>
     <p>Keep your membership link private. You don&apos;t need to share it to ask for help.</p>
-    <p>OVRMN is operated by ELITE STUCK SINGLE MEMBER P.C., Charas 27, 14122 Athens, Greece. VAT [EL VAT number].</p>
     <a href="sms:" className={s.button}>Open Messages</a>
   </article></MembershipShell>;
 }

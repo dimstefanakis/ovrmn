@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { MembershipShell } from "../join/shell";
 import s from "../join/membership.module.css";
 
-// DRAFT for legal review (2026-10-05). Not legal advice. Fill in the [bracketed] company details
-// and have a Greek lawyer/accountant confirm the withdrawal, liability and governing-law wording.
+// The only public page that names the company (operator's choice); keep company details off the others.
 export const metadata: Metadata = { title: "OVRMN — Terms", robots: { index: false, follow: false } };
 
 export default function TermsPage() {
@@ -29,8 +28,8 @@ export default function TermsPage() {
     <h2>Cancelling</h2>
     <p>Cancel anytime from the billing portal (ask OVRMN in Messages for the link) or by emailing <a href="mailto:support@ovrmn.com">support@ovrmn.com</a>. Cancelling stops future payments; you keep access until the end of the month you have paid for.</p>
 
-    <h2>Your right to withdraw (EU and UK consumers)</h2>
-    <p>You can withdraw from your membership within 14 days of subscribing, without giving a reason. Tell us by message or email. See <a href="/refunds">Cancellation &amp; refunds</a> for how refunds work, including during your first 14 days.</p>
+    <h2>No refunds</h2>
+    <p>Payments are non-refundable, including for a month you only partly use. Your membership starts as soon as you subscribe, at your request. See <a href="/refunds">Cancellation &amp; refunds</a>.</p>
 
     <h2>Using OVRMN fairly</h2>
     <p>Don&apos;t use OVRMN to harm anyone, to break the law, or to try to break, overload or misuse the service. We may pause or end access if you do.</p>
@@ -45,6 +44,6 @@ export default function TermsPage() {
     <p>These terms are governed by Greek law. If you live in the EU, you also keep the protection of the mandatory consumer laws of your country and can bring a claim there. Talk to us first at <a href="mailto:support@ovrmn.com">support@ovrmn.com</a>; you can also turn to an approved consumer dispute resolution body in Greece.</p>
 
     <h2>Who provides OVRMN</h2>
-    <p>OVRMN is operated by ELITE STUCK SINGLE MEMBER P.C., Charas 27, 14122 Athens, Greece. VAT number: [EL VAT number]. General Commercial Registry (GEMI) number: [GEMI number]. Contact: <a href="mailto:support@ovrmn.com">support@ovrmn.com</a>.</p>
+    <p>OVRMN is operated by ELITE STUCK SINGLE MEMBER P.C., Charas 27, 14122 Irakleio, Attica, Greece. VAT number: EL802799071. General Commercial Registry (GEMI) number: 182991603000. Contact: <a href="mailto:support@ovrmn.com">support@ovrmn.com</a>.</p>
   </article></MembershipShell>;
 }
