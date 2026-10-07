@@ -57,3 +57,23 @@ export function waitlistTimezone(value: unknown): string | null {
     return null;
   }
 }
+
+/** Accept bounded attribution, never client conversion claims or message data. */
+export function sanitizePtAnalytics(value: unknown) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const input = value as Record<string, unknown>;
+  const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
+  if (typeof input.event_id !== "string" || !uuid.test(input.event_id)) return undefined;
+  const data = input.attribution && typeof input.attribution === "object" && !Array.isArray(input.attribution)
+    ? input.attribution as Record<string, unknown> : {};
+  const attribution: Record<string, string> = {};
+  for (const [key, pattern, max] of [
+    ["anonymous_id", uuid, 36], ["fbp", /^fb\.\d+\.\d+\.\d+$/, 180],
+    ["fbc", /^fb\.\d+\.\d+\.[A-Za-z0-9_-]+$/, 500],
+  ] as const) {
+    const text = data[key];
+    if (typeof text === "string" && text.length <= max && pattern.test(text)) attribution[key] = text;
+  }
+  Object.assign(attribution, waitlistAttribution(data));
+  return { event_id: input.event_id, attribution };
+}

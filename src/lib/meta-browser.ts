@@ -1,5 +1,6 @@
 import type { MetaEventPayload, MetaEventName } from "@/lib/meta-events";
 import type { BookDemoAttribution } from "@/lib/book-demo";
+import { analyticsAllowedInBrowser, redactJoinUrls } from "@/lib/analytics-privacy";
 
 declare global {
   interface Window {
@@ -28,6 +29,11 @@ export function getMetaPixelId() {
   return META_PIXEL_ID;
 }
 
+export function getMetaPixelIdForPath(path: string) {
+  return /^\/pt(?:-waitlist)?(?:\/|$)/.test(path)
+    ? process.env.NEXT_PUBLIC_PT_META_PIXEL_ID || META_PIXEL_ID : META_PIXEL_ID;
+}
+
 export function createMetaEventId(prefix = "meta_event") {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return `${prefix}_${crypto.randomUUID()}`;
@@ -37,7 +43,7 @@ export function createMetaEventId(prefix = "meta_event") {
 }
 
 export function rememberAttributionFromBrowser() {
-  if (typeof window === "undefined") {
+  if (!analyticsAllowedInBrowser()) {
     return;
   }
 
@@ -78,13 +84,13 @@ export function rememberAttributionFromBrowser() {
   if (!readCookie("ovrmn_landing_path")) {
     writeCookie(
       "ovrmn_landing_path",
-      `${url.pathname}${url.search}`,
+      redactJoinUrls(`${url.pathname}${url.search}`),
       ATTRIBUTION_COOKIE_DAYS
     );
   }
 
   if (document.referrer && !readCookie("ovrmn_referrer")) {
-    writeCookie("ovrmn_referrer", document.referrer, ATTRIBUTION_COOKIE_DAYS);
+    writeCookie("ovrmn_referrer", redactJoinUrls(document.referrer), ATTRIBUTION_COOKIE_DAYS);
   }
 }
 
@@ -107,8 +113,8 @@ export function collectBookDemoAttribution(): BookDemoAttribution {
       readCookie("li_fat_id") ??
       undefined,
     landingPath:
-      readCookie("ovrmn_landing_path") ?? `${url.pathname}${url.search}`,
-    referrer: document.referrer || readCookie("ovrmn_referrer") || undefined,
+      redactJoinUrls(readCookie("ovrmn_landing_path") ?? `${url.pathname}${url.search}`),
+    referrer: redactJoinUrls(document.referrer || readCookie("ovrmn_referrer") || "") || undefined,
     utmCampaign:
       url.searchParams.get("utm_campaign") ??
       utmPayload?.utm_campaign ??
@@ -173,6 +179,7 @@ export function trackMetaCompleteRegistration(
 
 export function trackMetaEvent(payload: MetaEventPayload) {
   const eventId = payload.eventId || createMetaEventId(payload.eventName.toLowerCase());
+  if (!analyticsAllowedInBrowser()) return eventId;
 
   trackMetaBrowserEvent({
     ...payload,
@@ -208,7 +215,7 @@ function trackMetaBrowserEvent({
   eventId: string;
   eventName: MetaEventName;
 }) {
-  if (typeof window === "undefined") {
+  if (!analyticsAllowedInBrowser()) {
     return;
   }
 
@@ -237,14 +244,14 @@ function trackMetaBrowserEvent({
 }
 
 function sendMetaServerEvent(payload: MetaEventPayload & { eventId: string }) {
-  if (typeof window === "undefined") {
+  if (!analyticsAllowedInBrowser()) {
     return Promise.resolve(false);
   }
 
   const body = JSON.stringify({
     ...payload,
     attribution: collectBookDemoAttribution(),
-    eventSourceUrl: payload.eventSourceUrl || window.location.href,
+    eventSourceUrl: redactJoinUrls(payload.eventSourceUrl || window.location.href),
   });
 
   if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
