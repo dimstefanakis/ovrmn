@@ -7,9 +7,11 @@ import {
   WAITLIST_ENROLL_TIMEOUT_MS,
   WAITLIST_REQUEST_TIMEOUT_MS,
   waitlistAttribution,
+  sanitizePtAnalytics,
 } from "./pt-waitlist";
 import { POST, maxDuration } from "../app/api/pt-waitlist/route";
 import { phoneCountries } from "../app/pt-waitlist/phone-countries";
+import { getMetaPixelIdForPath, getMetaPixelId } from "./meta-browser";
 
 const originalFetch = globalThis.fetch;
 const envKeys = [
@@ -149,6 +151,58 @@ test("campaign capture allows only bounded campaign tags, not arbitrary URL or c
   );
   for (const value of [null, [], "bad"])
     assert.deepEqual(waitlistAttribution(value), {});
+});
+
+test("PT attribution accepts bounded IDs and campaign tags, stripping contacts, health data and conversion claims", () => {
+  const id = crypto.randomUUID();
+  assert.deepEqual(sanitizePtAnalytics({ event_id: id, event_name: "Purchase", amount: 29,
+    attribution: { anonymous_id: id, fbp: "fb.1.1234.5678", fbc: "fb.1.1234.click_id",
+      phone: "+12025550123", weight: 80, conversation: "private", url: "https://private.invalid",
+      utm_source: " meta ", utm_campaign: "x".repeat(200) } }), {
+    event_id: id, attribution: { anonymous_id: id, fbp: "fb.1.1234.5678", fbc: "fb.1.1234.click_id",
+      utm_source: "meta", utm_campaign: "x".repeat(160) },
+  });
+  assert.deepEqual(sanitizePtAnalytics({ event_id: id, attribution: { fbp: "x".repeat(501), anonymous_id: "bad" } }),
+    { event_id: id, attribution: {} });
+  for (const value of [null, [], "bad", { event_id: "bad" }]) assert.equal(sanitizePtAnalytics(value), undefined);
+  const previous = process.env.NEXT_PUBLIC_PT_META_PIXEL_ID;
+  try {
+    process.env.NEXT_PUBLIC_PT_META_PIXEL_ID = "123456";
+    for (const path of ["/pt", "/pt-waitlist", "/pt/a"]) assert.equal(getMetaPixelIdForPath(path), "123456");
+    for (const path of ["/", "/book", "/pt-other", "/joining"]) assert.equal(getMetaPixelIdForPath(path), getMetaPixelId());
+  } finally {
+    if (previous === undefined) delete process.env.NEXT_PUBLIC_PT_META_PIXEL_ID;
+    else process.env.NEXT_PUBLIC_PT_META_PIXEL_ID = previous;
+  }
+});
+
+test("only saved leads forward sanitized attribution and return the backend ID used for browser/server deduplication", async () => {
+  setup();
+  process.env.DEMI_API_URL = "https://api.ovrmn.test";
+  process.env.DEMI_ENROLLMENT_KEY = "enroll_test_only";
+  const clientId = crypto.randomUUID(), canonicalId = crypto.randomUUID();
+  let stored = false;
+  const signup = () => request({ phone: "+12025550123", consent: WAITLIST_CONSENT, timezone: "UTC",
+    analytics: { event_id: clientId, attribution: { utm_source: "meta", weight: 80, phone: "+12025550123",
+      client_user_agent: "forged", client_ip_address: "198.51.100.1" } } },
+    { "user-agent": "Mozilla/5.0 Synthetic", "x-forwarded-for": "192.0.2.1, 198.51.100.2" });
+  for (const full of [false, true]) {
+    stubFetch(async (url, init) => {
+      if (String(url).startsWith("https://api.airtable.com")) { stored = true; return saved(); }
+      assert.ok(stored);
+      assert.deepEqual(JSON.parse(String(init?.body)).analytics, { event_id: clientId, attribution: {
+        utm_source: "meta", client_user_agent: "Mozilla/5.0 Synthetic", client_ip_address: "192.0.2.1" } });
+      return full ? Response.json({ error: "enrollment_unavailable", leadEventId: canonicalId }, { status: 503 })
+        : Response.json({ phone: "+12025550123", number: "+14155550100", leadEventId: canonicalId });
+    });
+    const result = await (await POST(signup())).json();
+    assert.deepEqual(result, { ok: true, ...(full ? {} : { number: "+14155550100" }), leadEventId: canonicalId });
+    stored = false;
+  }
+  let calls = 0;
+  stubFetch(async () => { calls++; return new Response("failed", { status: 503 }); });
+  assert.equal((await POST(signup())).status, 503);
+  assert.equal(calls, 1, "a failed Airtable write must not generate a lead or enroll anyone");
 });
 
 test("misconfiguration fails closed, never returns a fake waitlist success", async () => {

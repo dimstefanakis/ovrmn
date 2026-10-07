@@ -1,9 +1,11 @@
 import { createHmac } from "node:crypto";
+import { isIP } from "node:net";
 import {
   WAITLIST_CONSENT,
   WAITLIST_SAVE_TIMEOUT_MS,
   WAITLIST_ENROLL_TIMEOUT_MS,
   normalizeWaitlistPhone,
+  sanitizePtAnalytics,
   waitlistAttribution,
   waitlistTimezone,
 } from "@/lib/pt-waitlist";
@@ -25,7 +27,7 @@ const reply = (body: object, status = 200) =>
 
 /** Signing up is joining: the coach's backend registers the person with Photon's pool
  * and answers with the number they text. Null keeps them on the waitlist instead. */
-async function admit(phone: string, timezone: string | null) {
+async function admit(phone: string, timezone: string | null, analytics?: ReturnType<typeof sanitizePtAnalytics>) {
   const origin = process.env.DEMI_API_URL;
   const secret = process.env.DEMI_ENROLLMENT_KEY;
   if (!origin || !secret || !timezone) return null;
@@ -38,15 +40,17 @@ async function admit(phone: string, timezone: string | null) {
         Authorization: `Bearer ${secret}`,
         "content-type": "application/json",
       },
-      body: JSON.stringify({ phone, timezone, consent: true, provider: "photon" }),
+      body: JSON.stringify({ phone, timezone, consent: true, provider: "photon", ...(analytics ? { analytics } : {}) }),
       signal: AbortSignal.timeout(WAITLIST_ENROLL_TIMEOUT_MS),
     });
-    if (!response.ok) return null;
     const body = await response.json();
+    const leadEventId = sanitizePtAnalytics({ event_id: body?.leadEventId })?.event_id;
+    // A full messaging pool does not undo the lead already saved in Airtable.
+    if (!response.ok) return leadEventId ? { leadEventId } : null;
     return body?.phone === phone &&
       typeof body?.number === "string" &&
       /^\+[1-9]\d{7,14}$/.test(body.number)
-      ? (body.number as string)
+      ? { number: body.number as string, ...(leadEventId ? { leadEventId } : {}) }
       : null;
   } catch {
     return null;
@@ -161,8 +165,17 @@ export async function POST(request: Request) {
       saved.records[0]?.fields?.Phone !== phone
     )
       return reply({ error: "unavailable" }, 503);
-    const number = await admit(phone, waitlistTimezone(body.timezone));
-    return reply(number ? { ok: true, number } : { ok: true });
+    const analytics = sanitizePtAnalytics(body.analytics);
+    // CAPI needs the original browser agent, not our backend fetch's agent.
+    // Form-supplied agent/IP fields were discarded by the sanitizer above.
+    const agent = request.headers.get("user-agent");
+    const clientIp = request.headers.get("x-forwarded-for")?.split(",")[0].trim();
+    if (analytics) {
+      if (agent && /^[\x20-\x7e]+$/.test(agent)) analytics.attribution.client_user_agent = agent.slice(0, 1024);
+      if (clientIp && isIP(clientIp)) analytics.attribution.client_ip_address = clientIp;
+    }
+    const admitted = await admit(phone, waitlistTimezone(body.timezone), analytics);
+    return reply(admitted ? { ok: true, ...admitted } : { ok: true });
   } catch {
     return reply({ error: "unavailable" }, 503);
   }

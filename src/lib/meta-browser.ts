@@ -29,6 +29,11 @@ export function getMetaPixelId() {
   return META_PIXEL_ID;
 }
 
+export function getMetaPixelIdForPath(path: string) {
+  return /^\/pt(?:-waitlist)?(?:\/|$)/.test(path)
+    ? process.env.NEXT_PUBLIC_PT_META_PIXEL_ID || META_PIXEL_ID : META_PIXEL_ID;
+}
+
 export function createMetaEventId(prefix = "meta_event") {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return `${prefix}_${crypto.randomUUID()}`;

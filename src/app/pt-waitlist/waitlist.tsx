@@ -19,6 +19,7 @@ import {
   normalizeWaitlistPhone,
 } from "@/lib/pt-waitlist";
 import type { PhoneCountry } from "./phone-countries";
+import { collectPtAnalytics, trackPtLead } from "@/lib/pt-analytics";
 import s from "./waitlist.module.css";
 
 const OpenWaitlist = createContext<(() => void) | null>(null);
@@ -52,6 +53,7 @@ export function WaitlistProvider({
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const submitting = useRef(false);
+  const leadEvent = useRef<{ phone: string; id: string } | null>(null);
   const [country, setCountry] = useState<CountryCode>("GR");
   const [phone, setPhone] = useState("");
   const [pending, setPending] = useState(false);
@@ -147,6 +149,9 @@ export function WaitlistProvider({
                 setPending(true);
                 setError("");
                 try {
+                  if (leadEvent.current?.phone !== normalized) {
+                    leadEvent.current = { phone: normalized, id: crypto.randomUUID() };
+                  }
                   const query = new URL(window.location.href).searchParams;
                   const response = await fetch("/api/pt-waitlist", {
                     method: "POST",
@@ -160,6 +165,7 @@ export function WaitlistProvider({
                       attribution: Object.fromEntries(
                         WAITLIST_UTM_KEYS.map((key) => [key, query.get(key)]),
                       ),
+                      analytics: collectPtAnalytics(leadEvent.current.id),
                     }),
                     signal: AbortSignal.timeout(WAITLIST_REQUEST_TIMEOUT_MS),
                   });
@@ -176,6 +182,7 @@ export function WaitlistProvider({
                   const result = await response.json();
                   if (result?.ok !== true)
                     throw new Error("signup_not_confirmed");
+                  if (typeof result.leadEventId === "string") trackPtLead(result.leadEventId);
                   setPhone("");
                   if (typeof result.number === "string") {
                     // A beat of suspense before the spot opens.

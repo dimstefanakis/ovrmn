@@ -4,13 +4,14 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Script from "next/script";
-import { getMetaPixelId, rememberAttributionFromBrowser } from "@/lib/meta-browser";
+import { getMetaPixelId, getMetaPixelIdForPath, rememberAttributionFromBrowser } from "@/lib/meta-browser";
 import { isPrivateJoinPath } from "@/lib/analytics-privacy";
 
 export function MetaPixel() {
   const pathname = usePathname();
   const lastPathname = useRef<string | null>(null);
-  const pixelId = getMetaPixelId();
+  const pixelId = getMetaPixelIdForPath(pathname);
+  const pixels = [...new Set([getMetaPixelId(), process.env.NEXT_PUBLIC_PT_META_PIXEL_ID].filter(Boolean))];
 
   useEffect(() => {
     if (isPrivateJoinPath(pathname)) {
@@ -24,7 +25,7 @@ export function MetaPixel() {
       lastPathname.current !== pathname &&
       typeof window.fbq === "function"
     ) {
-      window.fbq("track", "PageView");
+      window.fbq("trackSingle",getMetaPixelIdForPath(pathname),"PageView");
     }
 
     lastPathname.current = pathname;
@@ -47,8 +48,9 @@ export function MetaPixel() {
           t.src=v;s=b.getElementsByTagName(e)[0];
           s.parentNode.insertBefore(t,s)}(window, document,'script',
           'https://connect.facebook.net/en_US/fbevents.js');
-          fbq('init', '${pixelId}');
-          fbq('track', 'PageView');
+          ${pixels.map((id)=>`fbq('init', '${id}');`).join("\n")}
+          fbq('trackSingle', /^\\/pt(?:-waitlist)?(?:\\/|$)/.test(window.location.pathname)
+            ? '${process.env.NEXT_PUBLIC_PT_META_PIXEL_ID || getMetaPixelId()}' : '${getMetaPixelId()}', 'PageView');
           }
         `}
       </Script>
