@@ -37,7 +37,7 @@ Enrollment calls `POST /enroll` with `{ phone, timezone, consent: true, provider
 
 ## Behavior
 
-- Native country picker (Greece initially), flag, calling code and country-specific mobile example. The client accepts national numbers using the selected country; a full international number switches the picker automatically. The server still requires a normalized international number. No OTP: ownership is **not verified**.
+- Native country picker with no assumed country. National numbers require an explicit selection, then show the flag, calling code and country-specific mobile example. A full international number switches the picker automatically. Browser location, language and timezone never determine a phone's country. The server still requires a normalized international number. No OTP: ownership is **not verified**.
 - The action is **Request access**. Confirmed enrollment shows **You’re in** and the assigned iMessage line. The draft is Greek on Greek-language devices, English otherwise. If enrollment is unavailable or the browser has no valid timezone, the saved request stays on the waitlist. Country names/examples are generated server-side and serialized to avoid differences between browser and server locale data.
 - A single Airtable PATCH with `performUpsert.fieldsToMergeOn: ["Phone"]` handles repeated submissions. Supplied campaign tags are latest-touch; omitted tags and Airtable's original created time are preserved. Manually introducing duplicate Phone rows causes Airtable to reject ambiguous upserts rather than claim success.
 - Confirm only after Airtable returns the expected saved record. A retry after a lost response targets the same normalized Phone.
@@ -48,7 +48,7 @@ Enrollment calls `POST /enroll` with `{ phone, timezone, consent: true, provider
 
 ## Verification
 
-Run `bun test src/lib/pt-waitlist.test.ts src/app/pt/first-text.test.ts`, `bunx tsc --noEmit`, and `bun run build`.
+Run `bun test src/lib/pt-waitlist.test.ts src/app/pt-waitlist/waitlist.test.tsx src/app/pt/first-text.test.ts`, `bunx tsc --noEmit`, and `bun run build`.
 
 Provider tests mock Airtable, including duplicate upsert payloads and provider failures. Before deploying, configure the real table and verify a reserved test number saves once on repeated submission; remove only that test record afterward. Do not mistake a mocked test for live Airtable acceptance.
 

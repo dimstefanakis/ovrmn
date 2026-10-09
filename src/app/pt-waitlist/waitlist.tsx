@@ -54,7 +54,8 @@ export function WaitlistProvider({
   const dialog = useRef<HTMLDialogElement>(null);
   const submitting = useRef(false);
   const leadEvent = useRef<{ phone: string; id: string } | null>(null);
-  const [country, setCountry] = useState<CountryCode>("GR");
+  // A browser's location/language does not establish a phone's country.
+  const [country, setCountry] = useState<CountryCode | undefined>();
   const [phone, setPhone] = useState("");
   const [pending, setPending] = useState(false);
   // listed: kept on the waitlist; checking → in: a spot was opened for them.
@@ -66,7 +67,7 @@ export function WaitlistProvider({
   const [error, setError] = useState("");
   const selectedCountry = countries.find(
     (option) => option.country === country,
-  )!;
+  );
 
   return (
     <OpenWaitlist.Provider value={() => dialog.current?.showModal()}>
@@ -142,7 +143,11 @@ export function WaitlistProvider({
                 if (submitting.current) return;
                 const normalized = normalizeWaitlistPhone(phone, country);
                 if (!normalized) {
-                  setError("Check your number and selected country.");
+                  setError(
+                    !country && !/^\s*(?:\+|00)/.test(phone)
+                      ? "Choose your country code."
+                      : "Check your number and selected country.",
+                  );
                   return;
                 }
                 submitting.current = true;
@@ -204,8 +209,14 @@ export function WaitlistProvider({
               <div className={s.phoneField}>
                 <div className={s.countryPicker}>
                   <span className={s.countryDisplay} aria-hidden="true">
-                    <span className={s.flag}>{selectedCountry.flag}</span>
-                    <span>+{selectedCountry.callingCode}</span>
+                    {selectedCountry ? (
+                      <>
+                        <span className={s.flag}>{selectedCountry.flag}</span>
+                        <span>+{selectedCountry.callingCode}</span>
+                      </>
+                    ) : (
+                      <span>Code</span>
+                    )}
                     <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
                       <path
                         d="m1 1 4 4 4-4"
@@ -219,13 +230,16 @@ export function WaitlistProvider({
                     name="country"
                     aria-label="Country calling code"
                     className={s.countrySelect}
-                    value={country}
+                    value={country ?? ""}
                     disabled={pending}
+                    aria-invalid={Boolean(error) && !country}
+                    aria-describedby="waitlist-error"
                     onChange={(event) => {
                       setCountry(event.target.value as CountryCode);
                       setError("");
                     }}
                   >
+                    <option value="" disabled>Choose country code</option>
                     {countries.map((option) => (
                       <option key={option.country} value={option.country}>
                         {option.name} (+{option.callingCode}) {option.flag}
@@ -240,7 +254,7 @@ export function WaitlistProvider({
                   type="tel"
                   inputMode="tel"
                   autoComplete="tel"
-                  placeholder={selectedCountry.placeholder}
+                  placeholder={selectedCountry?.placeholder ?? "Phone number"}
                   value={phone}
                   onChange={(event) => {
                     const value = event.target.value;

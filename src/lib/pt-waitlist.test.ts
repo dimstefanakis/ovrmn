@@ -124,6 +124,17 @@ test("country selection normalizes local numbers and preserves explicit internat
     assert.equal(normalizeWaitlistPhone(value, "GR"), null);
 });
 
+test("ambiguous US local numbers need an explicit country, not the former Greece default", () => {
+  const local = "2515550123";
+  // Both parses are valid. Metadata cannot choose the owner's country for us.
+  assert.equal(normalizeWaitlistPhone(local, "GR"), "+302515550123");
+  assert.equal(normalizeWaitlistPhone(local), null);
+  assert.equal(normalizeWaitlistPhone(local, "US"), "+12515550123");
+  assert.equal(normalizeWaitlistPhone("(251) 555-0123", "US"), "+12515550123");
+  assert.equal(normalizeWaitlistPhone("+1 251 555 0123"), "+12515550123");
+  assert.equal(normalizeWaitlistPhone("0012515550123", "GR"), "+12515550123");
+});
+
 test("country choices provide flags, calling codes and country-specific mobile placeholders", () => {
   assert.ok(phoneCountries.length > 200);
   const placeholders = new Set<string>();
