@@ -2,6 +2,8 @@
 
 `/pt-waitlist` shares the `/pt` landing page, but both **Text OVRMN** buttons open a phone-only access dialog. The request is saved to Airtable, then the backend registers the person with Photon's shared pool and returns their assigned number. They tap **Text OVRMN** to open a draft and send the first message themselves. `/pt` keeps its existing direct iMessage link. This flow does not enroll a Linq contact or send a message.
 
+The homepage on `ovrmn.com` and `www.ovrmn.com` redirects to `/pt-waitlist` through Next.js routing on Vercel. Only `/` matches; PT, membership, API and generated-page routes retain their existing behavior. Query parameters pass through, including referral and campaign tags. The redirect uses 307 so browsers do not permanently cache this product choice. Other hostnames served by the project keep their existing homepage, and the previous homepage remains in the source. No Porkbun DNS forwarding is needed.
+
 ## Airtable setup
 
 Use the separate **PT** table, not the website's demo-leads table:

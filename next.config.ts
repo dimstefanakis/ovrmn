@@ -1,6 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/",
+        has: [{ type: "host", value: "(?:www\\.)?ovrmn\\.com" }],
+        destination: "/pt-waitlist",
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     const headers = [
       { key: "Referrer-Policy", value: "no-referrer" },
