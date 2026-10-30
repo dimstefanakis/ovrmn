@@ -42,7 +42,7 @@ export default function PrivacyPage() {
     <p>We don&apos;t sell your data, and we don&apos;t use it for advertising.</p>
 
     <h2>Who helps us</h2>
-    <p>We use service providers who process data for us under contract: hosting and databases (Google Cloud, Supabase, Vercel), AI processing (OpenAI, OpenRouter and its model-hosting providers), Messages delivery (Linq, Photon), payments (Stripe), and website analytics (PostHog). Relevant coaching information, including Health or location information you choose to share, can be processed by the AI service providers used to answer your requests. Some providers are in the United States; transfers rely on the EU–US Data Privacy Framework or the European Commission&apos;s standard contractual clauses.</p>
+    <p>We use service providers who process data for us under contract to provide hosting and databases, third-party AI processing, Messages delivery, payments, and website analytics. Relevant coaching information, including Health or location information you choose to share, can be processed by the third-party AI service providers used to answer your requests. Some providers are in the United States; transfers rely on the EU–US Data Privacy Framework or the European Commission&apos;s standard contractual clauses.</p>
 
     <h2>How long we keep it</h2>
     <p>We keep your coaching data while you use OVRMN. Ask us to forget something and OVRMN stops using it; ask us to delete your account and we delete your data, except billing records we must keep under tax law.</p>
