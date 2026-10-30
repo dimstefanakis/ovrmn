@@ -109,7 +109,10 @@ export default function PersonalTrainerLanding({
           <MessageCTA waitlist={waitlist} />
         </section>
       </main>
-      <footer className={s.footer}>© OVRMN</footer>
+      <footer className={s.footer}>
+        <span>© OVRMN</span>
+        <nav aria-label="Legal"><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav>
+      </footer>
     </>
   );
   return (
