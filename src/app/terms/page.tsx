@@ -9,7 +9,7 @@ export default function TermsPage() {
   return <MembershipShell><article className={s.policy}>
     <p className={s.kicker}>Legal</p>
     <h1>Terms.</h1>
-    <p className={s.updated}>Last updated October 5, 2026</p>
+    <p className={s.updated}>Last updated November 1, 2026</p>
 
     <h2>The service</h2>
     <p>OVRMN is an AI personal trainer and nutrition coach that you text in Messages. It helps with your workouts, food and progress. OVRMN is an AI, not a human coach, doctor, dietitian or physiotherapist.</p>
@@ -22,7 +22,9 @@ export default function TermsPage() {
 
     <h2>Free week and membership</h2>
     <p>Your first seven days of coaching are free, starting with your first message. No card is needed for the free week and it never turns into a paid plan on its own.</p>
-    <p>To keep coaching after that, you can join the membership: $29 per month, including any tax, billed by our payment provider Stripe. It renews every month until you cancel. Stripe shows the exact first payment date before you subscribe. If you join during your free week, your first payment is no earlier than the end of that week.</p>
+    <p>To keep coaching after that, you can join the membership, billed monthly by our payment provider Stripe. Your monthly price is agreed with your coach in Messages, includes any tax, and is shown on your membership page and by Stripe before you subscribe. Once you join, your price stays the same for as long as your membership continues. If you cancel and later join again, you pay our standard price at that time, which is not negotiable.</p>
+    <p>OVRMN&apos;s coach is an AI, and the price it offers you can be personalised by automated decision-making based on your conversation.</p>
+    <p>The membership renews every month until you cancel. Stripe shows the exact first payment date before you subscribe. If you join during your free week, your first payment is no earlier than the end of that week.</p>
     <p>If you don&apos;t join, OVRMN still replies to you and can help with access or billing questions, but ongoing coaching stops.</p>
 
     <h2>Cancelling</h2>
