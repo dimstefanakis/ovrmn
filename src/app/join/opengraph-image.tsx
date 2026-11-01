@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
-export const alt = "OVRMN — Keep your coach. $29/month, renews monthly, cancel anytime.";
+export const alt = "OVRMN — Keep your coach. Renews monthly, cancel anytime.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -27,7 +27,7 @@ export default async function MembershipImage() {
         <div style={{ display: "flex", fontFamily: "Serif", fontStyle: "italic", fontSize: 104, lineHeight: 1.02, color: "#8b8a85" }}>Still a message away.</div>
       </div>
       <div style={{ display: "flex", borderTop: "1px solid #2a2a27", paddingTop: 26, ...caption }}>
-        $29 / MONTH · RENEWS MONTHLY · CANCEL ANYTIME
+        YOUR PRICE · RENEWS MONTHLY · CANCEL ANYTIME
       </div>
     </div>,
     { ...size, fonts: [

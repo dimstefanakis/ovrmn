@@ -4,13 +4,13 @@ import { MembershipShell } from "./shell";
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.ovrmn.com"),
   title: "OVRMN — Keep your coach",
-  description: "Your personal trainer in iMessage. $29/month, renews monthly, cancel anytime.",
+  description: "Your personal trainer in iMessage. Renews monthly, cancel anytime.",
   robots: { index: false, follow: false, noarchive: true },
   referrer: "no-referrer",
   alternates: { canonical: null },
   openGraph: {
     title: "OVRMN — Keep your coach",
-    description: "Your personal trainer in iMessage. $29/month, renews monthly, cancel anytime.",
+    description: "Your personal trainer in iMessage. Renews monthly, cancel anytime.",
     siteName: "OVRMN",
     url: "https://www.ovrmn.com/join",
     type: "website",

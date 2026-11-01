@@ -35,17 +35,57 @@ test("PT, membership and legal navigation never leads to the separate product", 
   }
 });
 
-test("GET rendering is passive and provides an explicit POST checkout form", async () => {
-  globalThis.fetch = (() => { assert.fail("Rendering a preview must never call billing"); }) as unknown as typeof fetch;
-  const page = await JoinPage({ params: Promise.resolve({ token }), searchParams: Promise.resolve({ error: "private-provider-failure" }) });
-  const html = renderToStaticMarkup(page);
-  const form = html.match(/<form[^>]*>/)?.[0] || "";
-  assert.match(form, /method="post"/);
-  assert.match(form, /action="\/api\/join"/);
-  assert.match(html, new RegExp(`name="token" value="${token}"`));
-  assert.match(html, /Includes tax\. Renews monthly\. Cancel anytime\./);
-  assert.match(html, /Continue/);
-  assert.equal(html.includes("private-provider-failure"), false);
+function withBillingEnv() {
+  const saved = { url: process.env.DEMI_BILLING_API_URL, key: process.env.DEMI_BILLING_KEY };
+  process.env.DEMI_BILLING_API_URL = "https://api.synthetic.invalid";
+  process.env.DEMI_BILLING_KEY = "synthetic-billing-key";
+  return () => {
+    if (saved.url === undefined) delete process.env.DEMI_BILLING_API_URL; else process.env.DEMI_BILLING_API_URL = saved.url;
+    if (saved.key === undefined) delete process.env.DEMI_BILLING_KEY; else process.env.DEMI_BILLING_KEY = saved.key;
+  };
+}
+
+test("GET rendering only reads the agreed price and provides an explicit POST checkout form", async () => {
+  const restore = withBillingEnv();
+  const calls: { url: string; init: RequestInit }[] = [];
+  globalThis.fetch = (async (url: URL, init: RequestInit) => {
+    calls.push({ url: String(url), init });
+    return Response.json({ state: "price", amount_cents: 2499, amount: "$24.99" });
+  }) as unknown as typeof fetch;
+  try {
+    const page = await JoinPage({ params: Promise.resolve({ token }), searchParams: Promise.resolve({ error: "private-provider-failure" }) });
+    const html = renderToStaticMarkup(page);
+    // One read-only lookup; never a checkout.
+    assert.deepEqual(calls.map(c => c.url), ["https://api.synthetic.invalid/billing/price"]);
+    assert.equal(JSON.parse(String(calls[0]!.init.body)).token, token);
+    assert.equal((calls[0]!.init.headers as Record<string, string>).Authorization, "Bearer synthetic-billing-key");
+    const form = html.match(/<form[^>]*>/)?.[0] || "";
+    assert.match(form, /method="post"/);
+    assert.match(form, /action="\/api\/join"/);
+    assert.match(html, new RegExp(`name="token" value="${token}"`));
+    assert.match(html, /\$24\.99<span>\/ month<\/span>/);
+    assert.match(html, /Your price for as long as you stay\. Includes tax\. Renews monthly\. Cancel anytime\./);
+    assert.match(html, /Continue/);
+    assert.equal(html.includes("private-provider-failure"), false);
+  } finally { restore(); }
+});
+
+test("without a readable price the page still offers checkout, with no number", async () => {
+  const restore = withBillingEnv();
+  try {
+    for (const respond of [
+      async () => { throw new Error("offline"); },
+      async () => Response.json({ error: "billing_unavailable" }, { status: 503 }),
+      async () => Response.json({ state: "member" }),
+      async () => Response.json({ state: "price", amount_cents: 5 }),
+    ]) {
+      globalThis.fetch = respond as unknown as typeof fetch;
+      const html = renderToStaticMarkup(await JoinPage({ params: Promise.resolve({ token }), searchParams: Promise.resolve({}) }));
+      assert.doesNotMatch(html, /\/ month/);
+      assert.match(html, /Includes tax\. Renews monthly\. Cancel anytime\./);
+      assert.match(html, /action="\/api\/join"/);
+    }
+  } finally { restore(); }
 });
 
 test("an invalid link renders fresh-link help without making a membership lookup", async () => {

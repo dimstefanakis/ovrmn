@@ -12,8 +12,7 @@ export default async function JoinHelp({ searchParams }: {
       <p className={s.description}>Open your conversation with OVRMN to find your membership link or ask for help.</p>
       {error ? <p role="alert" className={s.error}>{error}</p> : null}
       <div className={s.priceRow}>
-        <p className={s.price}>$29<span>/ month</span></p>
-        <p className={s.renewal}>Renews monthly. Cancel anytime.</p>
+        <p className={s.renewal}>Your price is agreed with your coach in Messages. Renews monthly. Cancel anytime.</p>
       </div>
       <a href="sms:" className={s.button}>Open Messages</a>
     </>
