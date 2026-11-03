@@ -270,7 +270,24 @@
 .chip[aria-selected="true"] {
   background: var(--pill);
   color: var(--paper);
-  border-color: #ffffff26;
+  border-color: #ffffff80;
+}
+.chipFill {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  color: #111;
+  clip-path: inset(0 100% 0 0);
+  pointer-events: none;
+}
+.chip[aria-selected="true"] .chipFill {
+  clip-path: inset(0 calc((1 - var(--progress, 0)) * 100%) 0 0);
+  transition: clip-path 160ms linear;
+}
+.chip[data-complete] .chipFill {
+  clip-path: inset(0);
 }
 .swipeArea {
   width: 100%;
@@ -282,8 +299,8 @@
   opacity: 0;
   transform: translateX(10%);
   transition:
-    opacity 320ms ease-out,
-    transform 480ms var(--ease-drawer);
+    opacity 200ms ease-out,
+    transform 300ms var(--ease-drawer);
 }
 .scene[data-state="active"] {
   z-index: 2;
@@ -307,7 +324,7 @@
   z-index: 3;
   opacity: 1;
   transform: translateY(-101%);
-  transition: transform 520ms var(--ease-drawer);
+  transition: transform 320ms var(--ease-drawer);
 }
 .sceneShot {
   display: block;
@@ -323,7 +340,7 @@
   font-size: 14px;
   line-height: 1.5;
   text-align: center;
-  animation: rise 420ms var(--ease-out) both;
+  animation: rise 260ms var(--ease-out) both;
 }
 
 /* /pt: a direct Messages draft instead of the form. */
