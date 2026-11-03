@@ -1,0 +1,372 @@
+/* Dark-mode Messages on an iPhone 17 Pro screen (402 × 874 pt). --u is one iOS point. */
+.phone {
+  --bezel: #050605;
+  position: relative;
+  width: 100%;
+  padding: 3.2%;
+  border-radius: 15.5% / 7.2%;
+  background: var(--bezel);
+  box-shadow:
+    0 0 0 1.5px #3a3c38,
+    0 0 0 3px #151614,
+    0 40px 90px -30px #000c;
+}
+.screen {
+  container-type: inline-size;
+  position: relative;
+  aspect-ratio: 1206 / 2622;
+  border-radius: 12.6% / 5.8%;
+  overflow: hidden;
+  background: #000;
+  isolation: isolate;
+}
+.island {
+  position: absolute;
+  z-index: 5;
+  top: calc(100cqw / 402 * 11);
+  left: calc(50% - 100cqw / 402 * 62);
+  width: calc(100cqw / 402 * 124);
+  height: calc(100cqw / 402 * 36);
+  border-radius: 99px;
+  background: #000;
+}
+.shot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mini {
+  container-type: inline-size;
+  width: 100%;
+}
+.miniInner {
+  --u: calc(100cqw / 402);
+}
+.messages,
+.miniInner {
+  --u: calc(100cqw / 402);
+  --blue: #0a84ff;
+  --gray: #26252a;
+  --muted: #8e8e93;
+  --spring: linear(0, 0.034 1.1%, 0.141 2.4%, 0.538 6.4%, 0.774 9.4%, 0.921 12.4%, 1.012 15.9%, 1.052 19.7%, 1.061 22.6%, 1.058 25.8%, 1.026 33.4%, 1.006 40.5%, 0.997 49.6%, 1);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  color: #fff;
+  font-family: -apple-system, "SF Pro Text", "Helvetica Neue", var(--ov-sans), Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.messages {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+  color: #fff;
+  font-family: -apple-system, "SF Pro Text", "Helvetica Neue", var(--ov-sans), Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.status {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: calc(var(--u) * 54);
+  padding: calc(var(--u) * 6) calc(var(--u) * 34) 0 calc(var(--u) * 46);
+  font-size: calc(var(--u) * 17);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+.statusIcons {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 6);
+}
+.statusIcons svg {
+  height: calc(var(--u) * 12);
+  width: auto;
+  fill: currentColor;
+}
+
+.nav {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: calc(var(--u) * 2) calc(var(--u) * 16) calc(var(--u) * 8);
+  background: #000;
+}
+.glass {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: calc(var(--u) * 44);
+  height: calc(var(--u) * 44);
+  border-radius: 50%;
+  background: #1c1c1e;
+  border: 1px solid #ffffff14;
+  color: #fff;
+}
+.glass svg {
+  width: calc(var(--u) * 17);
+  height: calc(var(--u) * 17);
+}
+.contact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--u) * 4);
+  margin-top: calc(var(--u) * -2);
+}
+.avatar {
+  display: block;
+  width: calc(var(--u) * 50);
+  height: calc(var(--u) * 50);
+  border-radius: 50%;
+  background: #000;
+  object-fit: cover;
+}
+.name {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 3);
+  padding: calc(var(--u) * 3) calc(var(--u) * 10);
+  border-radius: 99px;
+  background: #1c1c1e;
+  font-size: calc(var(--u) * 12);
+  font-weight: 500;
+}
+.name svg {
+  width: calc(var(--u) * 6);
+  height: calc(var(--u) * 9);
+  color: var(--muted);
+}
+
+/* Rows start under the header; once the thread overflows, ThreadViewport lifts it so the newest row
+ * stays in view (a new row grows and pushes older ones out of the top). */
+.viewport {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.thread {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: calc(var(--u) * 4) 0 calc(var(--u) * 10);
+  list-style: none;
+  will-change: transform;
+}
+.row {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 460ms var(--ease-out);
+  padding: 0 calc(var(--u) * 16);
+}
+.row > div {
+  min-height: 0;
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 0;
+  transition: padding-top 460ms var(--ease-out);
+}
+.row[data-me] > div {
+  justify-content: flex-end;
+}
+.row[data-on] {
+  grid-template-rows: 1fr;
+}
+.row[data-on][data-gap="same"] > div {
+  padding-top: calc(var(--u) * 3);
+}
+.row[data-on][data-gap="group"] > div {
+  padding-top: calc(var(--u) * 12);
+}
+
+.row > div > * {
+  opacity: 0;
+  transform: translateY(calc(var(--u) * 14)) scale(0.88);
+  transform-origin: bottom left;
+  transition:
+    opacity 200ms ease-out,
+    transform 560ms var(--spring);
+}
+.row[data-me] > div > * {
+  transform-origin: bottom right;
+}
+.row[data-on] > div > * {
+  opacity: 1;
+  transform: none;
+}
+
+.time {
+  width: 100%;
+  text-align: center;
+  color: var(--muted);
+  font-size: calc(var(--u) * 12);
+  font-weight: 500;
+  padding: calc(var(--u) * 4) 0 calc(var(--u) * 2);
+}
+.row > div > .time {
+  transform-origin: center;
+}
+
+.bubble {
+  position: relative;
+  max-width: 76%;
+  margin: 0;
+  padding: calc(var(--u) * 8) calc(var(--u) * 13);
+  border-radius: calc(var(--u) * 19);
+  font-size: calc(var(--u) * 17);
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.me {
+  background: var(--blue);
+  color: #fff;
+}
+.coach {
+  background: var(--gray);
+  color: #fff;
+}
+.tailMe,
+.tailCoach {
+  position: absolute;
+  bottom: 0;
+  width: calc(var(--u) * 11);
+  height: calc(var(--u) * 17);
+}
+.tailMe {
+  right: calc(var(--u) * -5);
+  fill: var(--blue);
+}
+.tailCoach {
+  left: calc(var(--u) * -5);
+  transform: scaleX(-1);
+  fill: var(--gray);
+}
+
+.typing {
+  display: flex;
+  gap: calc(var(--u) * 5);
+  padding: calc(var(--u) * 13) calc(var(--u) * 15);
+}
+.typing > span {
+  width: calc(var(--u) * 8);
+  height: calc(var(--u) * 8);
+  border-radius: 50%;
+  background: #8e8e93;
+  animation: dot 1.2s ease-in-out infinite;
+}
+.typing > span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing > span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+.media {
+  width: 58%;
+  border-radius: calc(var(--u) * 18);
+  overflow: hidden;
+  background: #1c1c1e;
+}
+.media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.link {
+  width: 68%;
+  border-radius: calc(var(--u) * 18);
+  overflow: hidden;
+  background: var(--gray);
+}
+.link img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 390 / 250;
+  object-fit: cover;
+  object-position: top;
+}
+.linkText {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 2);
+  padding: calc(var(--u) * 9) calc(var(--u) * 13) calc(var(--u) * 11);
+  font-size: calc(var(--u) * 14);
+  line-height: 1.25;
+}
+.linkText strong {
+  font-weight: 600;
+}
+.linkText span {
+  color: var(--muted);
+  font-size: calc(var(--u) * 13);
+}
+
+.compose {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 10);
+  padding: calc(var(--u) * 6) calc(var(--u) * 14) calc(var(--u) * 30);
+}
+.compose .glass {
+  width: calc(var(--u) * 38);
+  height: calc(var(--u) * 38);
+}
+.compose .glass svg {
+  width: calc(var(--u) * 14);
+  height: calc(var(--u) * 14);
+}
+.field {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: calc(var(--u) * 38);
+  padding: 0 calc(var(--u) * 14);
+  border-radius: 99px;
+  background: #1c1c1e;
+  border: 1px solid #ffffff14;
+  color: #6b6b70;
+  font-size: calc(var(--u) * 16);
+}
+.field svg {
+  width: calc(var(--u) * 11);
+  height: calc(var(--u) * 17);
+  color: #8e8e93;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row,
+  .row > div {
+    transition: none;
+  }
+  .row > div > * {
+    transform: none;
+    transition: opacity 200ms ease-out;
+  }
+  .typing > span {
+    animation: none;
+  }
+}

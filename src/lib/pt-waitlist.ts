@@ -1,4 +1,5 @@
 import {
+  isSupportedCountry,
   parsePhoneNumberFromString,
   type CountryCode,
 } from "libphonenumber-js/min";
@@ -76,4 +77,11 @@ export function sanitizePtAnalytics(value: unknown) {
   }
   Object.assign(attribution, waitlistAttribution(data));
   return { event_id: input.event_id, attribution };
+}
+
+/** The visitor's country from Vercel's IP geolocation header, when it's one we can format numbers
+ * for. Only preselects the visible country picker; it never sets or validates a submitted number. */
+export function visitorCountry(headers: Headers): CountryCode | null {
+  const value = headers.get("x-vercel-ip-country")?.trim().toUpperCase() ?? "";
+  return /^[A-Z]{2}$/.test(value) && isSupportedCountry(value) ? value : null;
 }

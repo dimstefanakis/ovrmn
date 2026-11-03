@@ -1,0 +1,359 @@
+"use client";
+
+import Image from "next/image";
+import {
+  BellRing,
+  Camera,
+  Dumbbell,
+  MessageCircle,
+  ScanLine,
+  Search,
+  Smartphone,
+  type LucideIcon,
+} from "lucide-react";
+import {
+  createContext,
+  Fragment,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { trackLanding } from "@/lib/pt-analytics";
+import {
+  BRISK,
+  MessagesScreen,
+  Phone,
+  prefersReducedMotion,
+  threadDuration,
+  useThread,
+  type Message,
+} from "./imessage";
+import { REEL_FOOD, REEL_PAGE, REEL_RECAP, REEL_SESSION } from "./threads";
+import s from "../landing.module.css";
+
+/* ─────────────────────────────────────────────────────────
+ * HERO: ONE SENTENCE, ONE PHONE
+ *
+ * The hero sentence names the features as underlined phrases; each phrase is a
+ * control for the phone below it, as are the chips above the phone, a swipe on
+ * the phone and "Next". Nothing advances by itself. Each pick remounts its
+ * scene, so it plays from the start; once it has played, the next chip nudges.
+ *
+ *   Texts first   real lock screen recording, OVRMN notifications arrive;
+ *                 on leaving, the lock screen lifts away (drawer curve)
+ *   Workouts      the day's session, texted first          (brisk thread)
+ *   Food          a plate photo → the numbers               (brisk thread)
+ *   Form          real screenshot: the fix drawn on a frame
+ *   Finds         real screenshot: menus that fit the goal
+ *   Check-ins     the week, summed up unprompted            (brisk thread)
+ *   Pages         an answer turned into a page to keep      (brisk thread)
+ *   Your app      real recording: Home Screen → the OVRMN app → its tabs
+ *
+ * Transitions: a short sideways slide (10%, drawer curve) with an opacity fade, no
+ * blur, so screens stay sharp mid-transition; @starting-style covers remounts.
+ * Nothing plays until the phone is 55% on screen (or a scene is picked): on phones it only
+ * peeks at the fold, and the lock screen's notifications land on its lower half.
+ * Reduced motion: still frames, Next always visible.
+ * ───────────────────────────────────────────────────────── */
+
+const TIMING = {
+  threadHold:  1800,   // a thread's final frame before the next chip is hinted
+  image:       2400,   // a screenshot scene, before the hint
+  lock:        5300,   // the lock screen recording (last notification lands ~4.6s)
+  app:         8000,   // the app recording (7.6s) plus a beat
+  hintEarly:    600,   // the hint arrives slightly before the scene's natural end
+  swipe:         40,   // px of horizontal travel that counts as a swipe on the phone
+  scrollGap:     16,   // px left above the chips when a phrase brings the demo into view
+  visible:     0.55,   // share of the phone on screen before the first scene starts playing
+};
+
+type Scene = { key: string; chip: string; caption: string } & (
+  | { kind: "thread"; messages: Message[] }
+  | { kind: "image"; src: string; alt: string }
+  | { kind: "video"; src: string; poster: string; ms: number }
+);
+
+const SCENES: Scene[] = [
+  { key: "first", chip: "Texts first", caption: "OVRMN texts first. Nothing to remember.", kind: "video", src: "/pt/v2/lock.mp4", poster: "/pt/v2/lock-poster.webp", ms: TIMING.lock },
+  { key: "workouts", chip: "Workouts", caption: "Today’s session, built around your week.", kind: "thread", messages: REEL_SESSION },
+  { key: "food", chip: "Food", caption: "One photo. The numbers and the next step.", kind: "thread", messages: REEL_FOOD },
+  { key: "form", chip: "Form", caption: "A frame from your set, with the fix drawn on.", kind: "image", src: "/pt/v2/real-form-feedback.webp", alt: "Real conversation: a dumbbell-row video frame and an edited illustration with arrows showing how to keep the shoulder facing the floor" },
+  { key: "finds", chip: "Finds", caption: "Real menus and orders that fit your goal.", kind: "image", src: "/pt/v2/real-food-finds.webp", alt: "Real conversation: OVRMN recommends breakfast options from a real menu and shares the link" },
+  { key: "check-ins", chip: "Check-ins", caption: "Your week, summed up before you ask.", kind: "thread", messages: REEL_RECAP },
+  { key: "pages", chip: "Pages", caption: "Plans and lists you can keep.", kind: "thread", messages: REEL_PAGE },
+  { key: "app", chip: "Your app", caption: "Your own app, built from your texts.", kind: "video", src: "/pt/v2/app-open.mp4", poster: "/pt/v2/app-open-poster.webp", ms: TIMING.app },
+];
+
+/* The hero sentence. Plain strings are text; tuples are [phrase, scene, icon]. */
+const SENTENCE: (string | [string, string, LucideIcon])[] = [
+  "OVRMN ",
+  ["texts you first", "first", MessageCircle],
+  " with ",
+  ["your workout for today", "workouts", Dumbbell],
+  ", reads ",
+  ["a photo of your plate", "food", Camera],
+  ", fixes ",
+  ["your form from one frame", "form", ScanLine],
+  ", finds ",
+  ["what to order", "finds", Search],
+  ", sums up ",
+  ["your week", "check-ins", BellRing],
+  " and builds ",
+  ["an app just for you", "app", Smartphone],
+  ".",
+];
+
+function duration(scene: Scene) {
+  if (scene.kind === "thread") return threadDuration(scene.messages, BRISK) + TIMING.threadHold;
+  if (scene.kind === "image") return TIMING.image;
+  return scene.ms;
+}
+
+type Via = "chip" | "swipe" | "next" | "phrase";
+type Reel = {
+  client: boolean;
+  seen: boolean; // the phone has been mostly on screen (or the visitor picked a scene)
+  markSeen: () => void;
+  index: number;
+  previous: number | null;
+  visits: number[];
+  finished: boolean;
+  still: boolean;
+  go: (next: number, via: Via) => void;
+  stage: React.RefObject<HTMLDivElement | null>;
+};
+
+const ReelContext = createContext<Reel | null>(null);
+
+export function ReelProvider({ children }: { children: ReactNode }) {
+  const stage = useRef<HTMLDivElement>(null);
+  const [index, setIndex] = useState(0);
+  const [previous, setPrevious] = useState<number | null>(null);
+  // Bumped when a scene is picked, so it remounts and plays from the start every time.
+  const [visits, setVisits] = useState<number[]>(() => SCENES.map(() => 0));
+  const [finished, setFinished] = useState(false); // played through: hint the next chip
+  const [still, setStill] = useState(false);
+  // iOS Safari won't autoplay a <video> that arrives in the server HTML, only one created after
+  // hydration, so the server renders posters and videos mount once this flips.
+  const [client, setClient] = useState(false);
+  // Scenes wait until the phone is mostly visible: on a phone it peeks at the fold, and the lock
+  // screen's notifications land on its lower half, so playing on load would finish unseen.
+  const [seen, setSeen] = useState(false);
+  const markSeen = useCallback(() => setSeen(true), []);
+  const durations = useMemo(() => SCENES.map(duration), []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setStill(prefersReducedMotion());
+      setClient(true);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Never moves on by itself: once a scene has played, the next chip gets a gentle nudge.
+  useEffect(() => {
+    if (still || !seen) return;
+    const timer = setTimeout(() => setFinished(true), durations[index] - TIMING.hintEarly);
+    return () => clearTimeout(timer);
+  }, [index, visits, still, seen, durations]);
+
+  const go = (next: number, via: Via) => {
+    const target = (next + SCENES.length) % SCENES.length;
+    setPrevious(target === index ? previous : index);
+    setIndex(target);
+    setVisits((all) => all.map((n, i) => (i === target ? n + 1 : n)));
+    setFinished(false);
+    setSeen(true);
+    trackLanding("demo_feature_selected", { feature: SCENES[target].key, via });
+  };
+
+  return (
+    <ReelContext.Provider value={{ client, seen, markSeen, index, previous, visits, finished, still, go, stage }}>
+      {children}
+    </ReelContext.Provider>
+  );
+}
+
+function useReel() {
+  const reel = useContext(ReelContext);
+  if (!reel) throw new Error("FeatureReel parts must sit inside ReelProvider");
+  return reel;
+}
+
+/** The hero sentence, with each feature phrase playing its scene on the phone. */
+export function FeatureSentence() {
+  const { index, go, stage, still } = useReel();
+  return (
+    <p className={s.sentence}>
+      {SENTENCE.map((part, i) => {
+        if (typeof part === "string") return <Fragment key={i}>{part}</Fragment>;
+        const [phrase, key, Icon] = part;
+        const target = SCENES.findIndex((scene) => scene.key === key);
+        return (
+          <button
+            key={key}
+            type="button"
+            className={s.phrase}
+            aria-pressed={target === index}
+            onClick={() => {
+              go(target, "phrase");
+              // On a phone the demo sits below the sentence: bring it up with its chips in view.
+              const box = stage.current?.getBoundingClientRect();
+              if (box && (box.top > window.innerHeight * 0.45 || box.bottom < 120)) {
+                window.scrollTo({ top: window.scrollY + box.top - TIMING.scrollGap, behavior: still ? "auto" : "smooth" });
+              }
+            }}
+          >
+            {phrase}
+            <Icon aria-hidden="true" />
+          </button>
+        );
+      })}
+    </p>
+  );
+}
+
+export function FeatureReel() {
+  const { client, seen, markSeen, index, previous, visits, finished, still, go, stage } = useReel();
+  const chips = useRef<HTMLDivElement>(null);
+  const phone = useRef<HTMLDivElement>(null);
+  const swipe = useRef<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    const node = phone.current;
+    if (!node || seen) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.intersectionRatio >= TIMING.visible) markSeen();
+      },
+      { threshold: [TIMING.visible] },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [seen, markSeen]);
+
+  // Keep the active chip in view in the scrolling row, without moving the page.
+  useEffect(() => {
+    const row = chips.current;
+    const chip = row?.children[index] as HTMLElement | undefined;
+    if (!row || !chip) return;
+    const left = chip.offsetLeft - row.clientWidth / 2 + chip.clientWidth / 2;
+    row.scrollTo({ left, behavior: still ? "auto" : "smooth" });
+  }, [index, still]);
+
+  const scene = SCENES[index];
+  const next = (index + 1) % SCENES.length;
+  return (
+    <div ref={stage} className={s.reelHero}>
+      <div ref={chips} className={s.chips} role="tablist" aria-label="What OVRMN does">
+        {SCENES.map((item, i) => (
+          <button
+            key={item.key}
+            type="button"
+            role="tab"
+            aria-selected={i === index}
+            data-hint={(finished && i === next) || undefined}
+            className={s.chip}
+            onClick={() => go(i, "chip")}
+          >
+            {item.chip}
+          </button>
+        ))}
+      </div>
+      <div
+        ref={phone}
+        className={s.swipeArea}
+        onPointerDown={(event) => {
+          swipe.current = { x: event.clientX, y: event.clientY };
+        }}
+        onPointerUp={(event) => {
+          const start = swipe.current;
+          swipe.current = null;
+          if (!start) return;
+          const dx = event.clientX - start.x;
+          const dy = event.clientY - start.y;
+          if (Math.abs(dx) > TIMING.swipe && Math.abs(dx) > Math.abs(dy) * 1.3) go(index + (dx < 0 ? 1 : -1), "swipe");
+        }}
+        onPointerCancel={() => {
+          swipe.current = null;
+        }}
+      >
+        <Phone label={`${scene.chip}: ${scene.caption}`}>
+          {SCENES.map((item, i) => (
+            <SceneLayer
+              key={`${item.key}-${visits[i]}`}
+              scene={item}
+              state={i === index ? "active" : i === previous ? "past" : "idle"}
+              play={i === index && seen}
+              still={still}
+              live={client}
+            />
+          ))}
+        </Phone>
+      </div>
+      <p key={scene.key} className={s.reelCaption} aria-live="polite">
+        {scene.caption}
+      </p>
+      <button type="button" className={s.nextScene} data-visible={finished || still || undefined} onClick={() => go(next, "next")}>
+        Next: {SCENES[next].chip}
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+function SceneLayer({
+  scene,
+  state,
+  play,
+  still,
+  live,
+}: {
+  scene: Scene;
+  state: "active" | "past" | "idle";
+  play: boolean;
+  still: boolean;
+  live: boolean; // hydrated: videos may mount
+}) {
+  return (
+    <div className={s.scene} data-state={state} data-key={scene.key} aria-hidden={state !== "active"}>
+      {scene.kind === "thread" ? (
+        <ReelThread messages={scene.messages} play={play} still={still} />
+      ) : scene.kind === "image" ? (
+        <Image className={s.sceneShot} src={scene.src} alt={scene.alt} width={1260} height={2736} unoptimized />
+      ) : // One decoder at a time: the lock video stays through its own lift, the others only while active.
+      // A video mounts when its scene starts playing, so it always plays from the first frame.
+      live && !still && ((state === "active" && play) || (state === "past" && scene.key === "first")) ? (
+        <video
+          className={s.sceneShot}
+          src={scene.src}
+          poster={scene.poster}
+          muted
+          playsInline
+          autoPlay
+          preload="auto"
+          // Belt and braces for Safari: set muted on the element and ask it to play once mounted.
+          ref={(video) => {
+            if (!video || state !== "active") return;
+            video.muted = true;
+            void video.play().catch(() => {});
+          }}
+        />
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className={s.sceneShot} src={scene.poster} alt="" />
+      )}
+    </div>
+  );
+}
+
+function ReelThread({ messages, play, still }: { messages: Message[]; play: boolean; still: boolean }) {
+  const { shown, typing } = useThread(messages, play || still, 0, BRISK);
+  return <MessagesScreen messages={messages} shown={shown} typing={typing} />;
+}

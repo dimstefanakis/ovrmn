@@ -1,0 +1,1060 @@
+/* OVRMN landing (ovrmn.com → /pt-waitlist). House style: night and paper, Instrument Serif + Manrope,
+ * flat colour only (no gradients anywhere). Motion: transform / opacity / clip-path, once, strong ease-out. */
+
+/* Match the browser canvas exposed by macOS scroll bounce to this page. */
+:global(html):has(.world),
+:global(body):has(.world),
+.world {
+  --night: #111311;
+  background: var(--night);
+}
+.world {
+  --paper: #eeeae1;
+  --muted: #aeafa8;
+  --dim: #7d8076;
+  --surface: #1a1c18;
+  --pill: #232620;
+  --line: #ffffff17;
+  --ink: #191b18;
+  --sheet: #e9e7df;
+  --green: #34c759;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  position: relative;
+  z-index: 51;
+  color: var(--paper);
+  font-family: var(--ov-sans), Arial, sans-serif;
+  overflow: clip;
+}
+.world h1,
+.world h2,
+.world h3 {
+  font-family: var(--ov-serif), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.world a:focus-visible,
+.world button:focus-visible,
+.world summary:focus-visible {
+  outline: 2px solid #82afff;
+  outline-offset: 4px;
+}
+
+/* ---------- Reveals (set up by <Reveals/>; without JS everything is simply visible) ---------- */
+.world [data-reveal] {
+  transition:
+    opacity 650ms var(--ease-out),
+    transform 750ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+.world[data-motion="on"] [data-reveal]:not([data-shown]) {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.skip {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  transform: translateY(-200%);
+  background: white;
+  color: black;
+  padding: 12px;
+}
+.skip:focus {
+  transform: translateY(0);
+}
+.header {
+  padding: 30px 24px 0;
+  text-align: center;
+}
+.wordmark {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.08em;
+}
+.kicker {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.sectionHead {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+.sectionHead h2 {
+  margin-top: 14px;
+  font-size: clamp(42px, 5.6vw, 76px);
+  line-height: 1.02;
+}
+.sectionHead > p:not(.kicker) {
+  margin: 20px auto 0;
+  max-width: 34ch;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  display: grid;
+  gap: 56px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 52px 24px 96px;
+}
+.heroCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  border-radius: 99px;
+  background: var(--pill);
+  border: 1px solid var(--line);
+  color: var(--paper);
+  font-size: 13px;
+  font-weight: 500;
+}
+.badge .messagesIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+}
+.badge .messagesIcon svg {
+  width: 20px;
+  height: 20px;
+}
+.heroCopy h1 {
+  margin-top: 26px;
+  font-size: clamp(50px, 6.4vw, 92px);
+  line-height: 1;
+}
+.heroSignup {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 32px;
+}
+.heroStage {
+  display: flex;
+  justify-content: center;
+}
+.replay {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 18px auto 0;
+  padding: 8px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 300ms ease,
+    transform 160ms ease-out;
+}
+.replay[data-visible] {
+  opacity: 1;
+  pointer-events: auto;
+}
+.replay:active {
+  transform: scale(0.97);
+}
+.replay svg {
+  width: 14px;
+  height: 14px;
+}
+
+.sentence {
+  margin-top: 22px;
+  max-width: 34ch;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.75;
+  text-wrap: pretty;
+}
+.phrase {
+  display: inline;
+  padding: 0 1px;
+  color: var(--paper);
+  font: inherit;
+  font-weight: 500;
+  text-align: inherit;
+  text-decoration: underline;
+  text-decoration-color: #ffffff47;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition:
+    background-color 200ms ease,
+    text-decoration-color 200ms ease;
+}
+.phrase svg {
+  display: inline-block;
+  width: 0.95em;
+  height: 0.95em;
+  margin-left: 5px;
+  vertical-align: -0.12em;
+  color: var(--muted);
+  stroke-width: 1.8;
+  transition: color 200ms ease;
+}
+.phrase[aria-pressed="true"] {
+  background: var(--pill);
+  text-decoration-color: var(--paper);
+}
+.phrase[aria-pressed="true"] svg {
+  color: var(--paper);
+}
+@media (hover: hover) and (pointer: fine) {
+  .phrase:hover {
+    text-decoration-color: var(--paper);
+  }
+}
+
+/* ---------- Hero feature reel ---------- */
+.reelHero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(360px, 86vw);
+}
+.chips {
+  display: flex;
+  gap: 6px;
+  width: calc(100% + 48px);
+  margin: 0 -24px 18px;
+  padding: 0 24px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.chips::-webkit-scrollbar {
+  display: none;
+}
+.chip {
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+  padding: 8px 13px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  isolation: isolate;
+  transition:
+    color 200ms ease,
+    background-color 200ms ease,
+    transform 160ms ease-out;
+}
+.chip:active {
+  transform: scale(0.97);
+}
+.chip[aria-selected="true"] {
+  background: var(--pill);
+  color: var(--paper);
+  border-color: #ffffff26;
+}
+.chip[data-hint] {
+  color: var(--paper);
+  border-color: #ffffff40;
+  animation: nudge 1.4s var(--ease-out) 2;
+}
+@keyframes nudge {
+  50% {
+    transform: scale(1.06);
+    background: #ffffff14;
+  }
+}
+.swipeArea {
+  width: 100%;
+  touch-action: pan-y;
+}
+.scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateX(10%);
+  transition:
+    opacity 320ms ease-out,
+    transform 480ms var(--ease-drawer);
+}
+.scene[data-state="active"] {
+  z-index: 2;
+  opacity: 1;
+  transform: none;
+}
+/* A picked scene remounts; it still slides in rather than popping. */
+@starting-style {
+  .scene[data-state="active"] {
+    opacity: 0;
+    transform: translateX(10%);
+  }
+}
+.scene[data-state="past"] {
+  z-index: 1;
+  opacity: 0;
+  transform: translateX(-10%);
+}
+/* The lock screen leaves like a real unlock: it lifts away over the next scene. */
+.scene[data-key="first"][data-state="past"] {
+  z-index: 3;
+  opacity: 1;
+  transform: translateY(-101%);
+  transition: transform 520ms var(--ease-drawer);
+}
+.sceneShot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+.nextScene {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 9px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  color: var(--paper);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition:
+    opacity 300ms ease,
+    transform 300ms var(--ease-out);
+}
+.nextScene[data-visible] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+.nextScene:active {
+  transform: scale(0.97);
+}
+.nextScene svg {
+  width: 13px;
+  height: 13px;
+}
+.reelCaption {
+  min-height: 44px;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+  animation: rise 420ms var(--ease-out) both;
+}
+
+/* /pt: a direct Messages draft instead of the form. */
+.messageCta {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  min-width: 211px;
+  padding: 12px 23px 12px 16px;
+  border-radius: 14px;
+  background: #f4f2ec;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 160ms ease-out;
+}
+.messageCta:active {
+  transform: scale(0.97);
+}
+.messageCta[aria-disabled="true"] {
+  cursor: default;
+}
+.messagesIcon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--green);
+  flex-shrink: 0;
+}
+.messagesIcon svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* ---------- What OVRMN does ---------- */
+.features {
+  padding: 24px 24px 112px;
+}
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  max-width: 1080px;
+  margin: 48px auto 0;
+  padding: 0;
+  list-style: none;
+}
+.featureGrid li {
+  padding: 20px 18px 22px;
+  border-radius: 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.featureGrid svg {
+  width: 22px;
+  height: 22px;
+  color: var(--paper);
+  stroke-width: 1.6;
+}
+.featureGrid h3 {
+  margin-top: 16px;
+  font-family: var(--ov-sans), Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.featureGrid p {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ---------- A week with OVRMN: a timeline of real moments ---------- */
+.week {
+  padding: 40px 24px 120px;
+}
+.timeline {
+  position: relative;
+  display: grid;
+  gap: 64px;
+  max-width: 980px;
+  margin: 64px auto 0;
+  padding: 0 0 0 26px;
+  list-style: none;
+}
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: var(--line);
+}
+.moment {
+  position: relative;
+  display: grid;
+  gap: 20px;
+}
+.moment::before {
+  content: "";
+  position: absolute;
+  left: -26px;
+  top: 6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: 0 0 0 5px var(--night);
+}
+.when {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.momentCopy h3 {
+  margin-top: 8px;
+  font-size: clamp(30px, 3.4vw, 42px);
+  line-height: 1.05;
+}
+.momentCopy > p:last-child {
+  margin-top: 10px;
+  max-width: 36ch;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.6;
+}
+.momentChat {
+  width: min(100%, 380px);
+}
+
+/* ---------- Your own app (paper section) ---------- */
+.app {
+  background: var(--sheet);
+  color: var(--ink);
+  padding: 104px 24px;
+}
+.appInner {
+  display: grid;
+  gap: 56px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+.appCopy {
+  max-width: 460px;
+  margin: 0 auto;
+  text-align: center;
+}
+.app .kicker {
+  color: #5d6158;
+}
+.appCopy h2 {
+  margin-top: 14px;
+  font-size: clamp(44px, 5.6vw, 76px);
+  line-height: 1.02;
+}
+.appCopy > p:not(.kicker):not(.footnote) {
+  margin-top: 20px;
+  color: #474b43;
+  font-size: 17px;
+  line-height: 1.6;
+}
+.appList {
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+.appList li {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  border-top: 1px solid #0000001a;
+  color: #474b43;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.appList li:last-child {
+  border-bottom: 1px solid #0000001a;
+}
+.appList strong {
+  flex: 0 0 80px;
+  color: var(--ink);
+  font-weight: 600;
+}
+.footnote {
+  margin-top: 18px;
+  color: #6b6f66;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.appStage {
+  display: flex;
+  justify-content: center;
+}
+.reel {
+  width: min(330px, 80vw);
+}
+.reelVideo,
+.reelApps {
+  position: absolute;
+  inset: 0;
+  transition: opacity 500ms ease;
+}
+.reelVideo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+}
+.reelVideo[data-on] {
+  opacity: 1;
+}
+.reelApps {
+  --u: calc(100cqw / 402);
+  background: var(--night);
+  opacity: 0;
+}
+.reelApps[data-on] {
+  opacity: 1;
+}
+.reelApp {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: translateX(14%);
+  transition:
+    opacity 380ms ease-out,
+    transform 520ms var(--ease-drawer);
+}
+.reelApp[data-on] {
+  opacity: 1;
+  transform: none;
+}
+.reelApp[data-past] {
+  opacity: 0;
+  transform: translateX(-14%);
+}
+.reelFoot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 22px;
+  min-height: 82px;
+}
+.reelLabel {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  animation: rise 500ms var(--ease-out) both;
+}
+.app .replay {
+  border-color: #0000001f;
+  color: #5d6158;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* ---------- Real messages ---------- */
+.real {
+  padding: 120px 0 112px;
+}
+.real .sectionHead {
+  padding: 0 24px;
+}
+.realRow {
+  display: flex;
+  gap: 18px;
+  margin: 64px 0 0;
+  padding: 0 24px 8px;
+  list-style: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 24px;
+  scrollbar-width: none;
+}
+.realRow::-webkit-scrollbar {
+  display: none;
+}
+.realRow li {
+  flex: 0 0 min(250px, 66vw);
+  scroll-snap-align: start;
+}
+.realRow p {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ---------- Your data ---------- */
+.trust {
+  padding: 24px 24px 112px;
+}
+.trustGrid {
+  display: grid;
+  gap: 10px;
+  max-width: 1000px;
+  margin: 48px auto 0;
+  padding: 0;
+  list-style: none;
+}
+.trustGrid li {
+  padding: 24px 22px;
+  border-radius: 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.trustGrid svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.6;
+}
+.trustGrid h3 {
+  margin-top: 14px;
+  font-size: 26px;
+  line-height: 1.1;
+}
+.trustGrid p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* ---------- How it starts ---------- */
+.start {
+  padding: 40px 24px 112px;
+}
+.steps {
+  display: grid;
+  gap: 10px;
+  max-width: 1000px;
+  margin: 48px auto 0;
+  padding: 0;
+  list-style: none;
+}
+.steps li {
+  display: flex;
+  gap: 18px;
+  padding: 24px;
+  border-radius: 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.steps li > span {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--pill);
+  color: var(--paper);
+  font-size: 14px;
+  font-weight: 600;
+}
+.steps h3 {
+  font-size: 28px;
+  line-height: 1.1;
+}
+.steps p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.priceLine {
+  max-width: 1000px;
+  margin: 28px auto 0;
+  color: var(--paper);
+  font-size: 16px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* ---------- FAQ ---------- */
+.faq {
+  padding: 40px 24px 120px;
+}
+.faqList {
+  max-width: 760px;
+  margin: 48px auto 0;
+  border-top: 1px solid var(--line);
+}
+.faqItem {
+  border-bottom: 1px solid var(--line);
+}
+.faqItem summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 22px 4px;
+  font-size: 17px;
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+}
+.faqItem summary::-webkit-details-marker {
+  display: none;
+}
+.faqItem summary svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--muted);
+  transition: transform 220ms var(--ease-out);
+}
+.faqItem[open] summary svg {
+  transform: rotate(45deg);
+}
+.faqItem p {
+  padding: 0 4px 24px;
+  max-width: 60ch;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+.faqItem[open] p {
+  animation: rise 360ms var(--ease-out) both;
+}
+
+/* ---------- Final call ---------- */
+.final {
+  padding: 24px 24px 104px;
+}
+.finalArt {
+  position: relative;
+  max-width: 1100px;
+  aspect-ratio: 1912 / 1200;
+  margin: 0 auto;
+  border-radius: 28px;
+  overflow: hidden;
+  background: #0b0b0b;
+}
+.finalArt img {
+  object-fit: cover;
+}
+.finalCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 760px;
+  margin: 56px auto 0;
+  text-align: center;
+}
+.finalCopy h2 {
+  font-size: clamp(44px, 6vw, 84px);
+  line-height: 1;
+}
+.finalSignup {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 32px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin: 0;
+  padding: 29px 24px calc(29px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  color: #91968a;
+  text-align: center;
+  font-size: 12px;
+}
+.footer nav {
+  display: flex;
+  gap: 18px;
+}
+.footer a {
+  text-underline-offset: 4px;
+}
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Sticky call to action: a slim bar from the top (iOS 26 Safari floats its toolbar over the bottom) ---------- */
+.sticky {
+  position: fixed;
+  z-index: 60;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: calc(env(safe-area-inset-top) + 10px) 16px 10px 22px;
+  background: var(--night);
+  border-bottom: 1px solid var(--line);
+  /* Hidden: moved well above and transparent, since iOS 26 Safari draws page content under the status bar. */
+  opacity: 0;
+  transform: translateY(calc(-100% - 64px));
+  transition:
+    transform 200ms ease-out,
+    opacity 160ms ease-out;
+}
+.sticky[data-visible] {
+  opacity: 1;
+  transform: none;
+  transition:
+    transform 420ms var(--ease-drawer),
+    opacity 200ms ease-out;
+}
+.sticky .wordmark {
+  font-size: 20px;
+}
+.stickyButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 16px 0 7px;
+  border-radius: 12px;
+  background: #f4f2ec;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: transform 160ms ease-out;
+}
+.stickyButton .messagesIcon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+}
+.stickyButton .messagesIcon svg {
+  width: 25px;
+  height: 25px;
+}
+.stickyButton:active {
+  transform: scale(0.97);
+}
+
+/* ---------- Wider screens ---------- */
+/* ---------- Phones: keep the demo peeking above the fold ---------- */
+@media (max-width: 959px) {
+  .header {
+    padding-top: 14px;
+  }
+  .hero {
+    gap: 22px;
+    padding-top: 18px;
+  }
+  /* The headline already says iMessage; the badge costs a row the demo needs. */
+  .badge {
+    display: none;
+  }
+  .heroCopy h1 {
+    margin-top: 0;
+    font-size: clamp(42px, 11.4vw, 52px);
+  }
+  .sentence {
+    max-width: none;
+    margin-top: 14px;
+    font-size: 16.5px;
+    line-height: 1.62;
+  }
+  .heroSignup {
+    margin-top: 18px;
+  }
+  .chips {
+    margin-bottom: 12px;
+  }
+}
+@media (min-width: 960px) {
+  .header {
+    padding-top: 36px;
+  }
+  .hero {
+    grid-template-columns: 1fr 340px;
+    align-items: start;
+    gap: 72px;
+    padding: 32px 40px 120px;
+  }
+  .hero > .heroCopy {
+    padding-top: 48px;
+  }
+  .heroCopy h1 {
+    font-size: clamp(56px, 5.2vw, 80px);
+  }
+  .sentence {
+    max-width: 46ch;
+  }
+  .heroCopy {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .heroSignup {
+    justify-content: flex-start;
+  }
+  .reelHero {
+    width: 330px;
+  }
+  .chips {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    margin: 0 0 18px;
+    padding: 0;
+    overflow: visible;
+  }
+  .featureGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .moment {
+    grid-template-columns: 1fr 380px;
+    align-items: start;
+    gap: 64px;
+  }
+  .appInner {
+    grid-template-columns: 1fr 360px;
+    align-items: center;
+    gap: 96px;
+  }
+  .appCopy {
+    margin: 0;
+    text-align: left;
+  }
+  .reel {
+    width: 350px;
+  }
+  .realRow {
+    justify-content: center;
+    overflow: visible;
+  }
+  .realRow li {
+    flex-basis: 270px;
+  }
+  .trustGrid,
+  .steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .steps li {
+    flex-direction: column;
+  }
+  .sticky {
+    padding-inline: 40px;
+  }
+}
+@media (max-width: 380px) {
+  .hero {
+    padding-inline: 18px;
+  }
+  .heroCopy h1 {
+    font-size: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world [data-reveal],
+  .scene,
+  .sticky,
+  .sticky[data-visible] {
+    transition-duration: 0ms;
+  }
+  .reelApp,
+  .scene {
+    transform: none;
+  }
+}
