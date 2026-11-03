@@ -265,27 +265,12 @@
   isolation: isolate;
   transition:
     color 200ms ease,
-    background-color 200ms ease,
-    transform 160ms ease-out;
-}
-.chip:active {
-  transform: scale(0.97);
+    background-color 200ms ease;
 }
 .chip[aria-selected="true"] {
   background: var(--pill);
   color: var(--paper);
   border-color: #ffffff26;
-}
-.chip[data-hint] {
-  color: var(--paper);
-  border-color: #ffffff40;
-  animation: nudge 1.4s var(--ease-out) 2;
-}
-@keyframes nudge {
-  50% {
-    transform: scale(1.06);
-    background: #ffffff14;
-  }
 }
 .swipeArea {
   width: 100%;
@@ -330,37 +315,6 @@
   height: 100%;
   object-fit: cover;
   background: #000;
-}
-.nextScene {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 4px;
-  padding: 9px 14px;
-  border-radius: 99px;
-  border: 1px solid var(--line);
-  color: var(--paper);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(4px);
-  transition:
-    opacity 300ms ease,
-    transform 300ms var(--ease-out);
-}
-.nextScene[data-visible] {
-  opacity: 1;
-  pointer-events: auto;
-  transform: none;
-}
-.nextScene:active {
-  transform: scale(0.97);
-}
-.nextScene svg {
-  width: 13px;
-  height: 13px;
 }
 .reelCaption {
   min-height: 44px;

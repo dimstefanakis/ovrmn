@@ -41,8 +41,8 @@ import s from "../landing.module.css";
  *
  * The hero sentence names the features as underlined phrases; each phrase is a
  * control for the phone below it, as are the chips above the phone, a swipe on
- * the phone and "Next". Nothing advances by itself. Each pick remounts its
- * scene, so it plays from the start; once it has played, the next chip nudges.
+ * the phone. Scenes advance automatically and loop; the controls can jump ahead.
+ * Each scene remounts on entry, so its recording or conversation plays from the start.
  *
  *   Texts first   real lock screen recording, OVRMN notifications arrive;
  *                 on leaving, the lock screen lifts away (drawer curve)
@@ -59,15 +59,14 @@ import s from "../landing.module.css";
  * The opening clip starts on load and replays from its first frame the first time the phone is
  * 55% on screen (on phones it only peeks at the fold, and the lock screen's notifications land on
  * its lower half). If iOS blocks video (Low Power Mode), an animated-image copy plays instead.
- * Reduced motion: static threads and transitions, Next always visible; product recordings still play.
+ * Reduced motion: static threads and transitions; the demo still advances automatically.
  * ───────────────────────────────────────────────────────── */
 
 const TIMING = {
-  threadHold:  1800,   // a thread's final frame before the next chip is hinted
-  image:       2400,   // a screenshot scene, before the hint
+  threadHold:  1800,   // hold a thread's final frame before advancing
+  image:       4000,   // reading time for a screenshot scene
   lock:        5300,   // the lock screen recording (last notification lands ~4.6s)
   app:         8000,   // the app recording (7.6s) plus a beat
-  hintEarly:    600,   // the hint arrives slightly before the scene's natural end
   swipe:         40,   // px of horizontal travel that counts as a swipe on the phone
   scrollGap:     16,   // px left above the chips when a phrase brings the demo into view
   visible:     0.55,   // share of the phone on screen before the first scene starts playing
@@ -115,7 +114,7 @@ function duration(scene: Scene) {
   return scene.ms;
 }
 
-type Via = "chip" | "swipe" | "next" | "phrase";
+type Via = "chip" | "swipe" | "phrase" | "auto";
 type Reel = {
   client: boolean;
   seen: boolean; // the phone has been mostly on screen (or the visitor picked a scene)
@@ -123,7 +122,7 @@ type Reel = {
   index: number;
   previous: number | null;
   visits: number[];
-  finished: boolean;
+  complete: () => void;
   still: boolean;
   go: (next: number, via: Via) => void;
   stage: React.RefObject<HTMLDivElement | null>;
@@ -137,12 +136,11 @@ export function ReelProvider({ children }: { children: ReactNode }) {
   const [previous, setPrevious] = useState<number | null>(null);
   // Bumped when a scene is picked, so it remounts and plays from the start every time.
   const [visits, setVisits] = useState<number[]>(() => SCENES.map(() => 0));
-  const [finished, setFinished] = useState(false); // played through: hint the next chip
   const [still, setStill] = useState(false);
   // Render posters on the server, then mount videos with their muted/inline playback setup
   // after hydration. DemoVideo handles browsers that refuse autoplay.
   const [client, setClient] = useState(false);
-  // Threads and the next-scene hint wait until the phone is mostly visible. The opening video
+  // The automatic sequence waits until the phone is mostly visible. The opening video
   // starts at the fold, then restarts once its lower half and notifications are in view.
   const [seen, setSeen] = useState(false);
   const markSeen = useCallback(() => setSeen(true), []);
@@ -156,25 +154,31 @@ export function ReelProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(timer);
   }, []);
 
-  // Never moves on by itself: once a scene has played, the next chip gets a gentle nudge.
-  useEffect(() => {
-    if (still || !seen) return;
-    const timer = setTimeout(() => setFinished(true), durations[index] - TIMING.hintEarly);
-    return () => clearTimeout(timer);
-  }, [index, visits, still, seen, durations]);
-
-  const go = (next: number, via: Via) => {
+  const go = useCallback((next: number, via: Via) => {
     const target = (next + SCENES.length) % SCENES.length;
     setPrevious(target === index ? previous : index);
     setIndex(target);
     setVisits((all) => all.map((n, i) => (i === target ? n + 1 : n)));
-    setFinished(false);
     setSeen(true);
-    trackLanding("demo_feature_selected", { feature: SCENES[target].key, via });
-  };
+    // Keep automatic progression out of the manual-selection funnel.
+    if (via !== "auto") trackLanding("demo_feature_selected", { feature: SCENES[target].key, via });
+  }, [index, previous]);
+
+  const complete = useCallback(() => {
+    if (seen) go(index + 1, "auto");
+  }, [seen, index, go]);
+
+  // Recordings advance on their real ended event (or the loaded fallback's completion).
+  // Conversations get their full typing schedule plus reading time; screenshots hold still.
+  // Choosing any scene resets its timer, then automatic progression continues from there.
+  useEffect(() => {
+    if (!seen || SCENES[index].kind === "video") return;
+    const timer = setTimeout(complete, durations[index]);
+    return () => clearTimeout(timer);
+  }, [index, visits, seen, durations, complete]);
 
   return (
-    <ReelContext.Provider value={{ client, seen, markSeen, index, previous, visits, finished, still, go, stage }}>
+    <ReelContext.Provider value={{ client, seen, markSeen, index, previous, visits, complete, still, go, stage }}>
       {children}
     </ReelContext.Provider>
   );
@@ -220,7 +224,7 @@ export function FeatureSentence() {
 }
 
 export function FeatureReel() {
-  const { client, seen, markSeen, index, previous, visits, finished, still, go, stage } = useReel();
+  const { client, seen, markSeen, index, previous, visits, complete, still, go, stage } = useReel();
   const chips = useRef<HTMLDivElement>(null);
   const phone = useRef<HTMLDivElement>(null);
   const swipe = useRef<{ x: number; y: number } | null>(null);
@@ -244,11 +248,10 @@ export function FeatureReel() {
     const chip = row?.children[index] as HTMLElement | undefined;
     if (!row || !chip) return;
     const left = chip.offsetLeft - row.clientWidth / 2 + chip.clientWidth / 2;
-    row.scrollTo({ left, behavior: still ? "auto" : "smooth" });
-  }, [index, still]);
+    row.scrollTo({ left, behavior: "instant" });
+  }, [index]);
 
   const scene = SCENES[index];
-  const next = (index + 1) % SCENES.length;
   return (
     <div ref={stage} className={s.reelHero}>
       <div ref={chips} className={s.chips} role="tablist" aria-label="What OVRMN does">
@@ -258,7 +261,6 @@ export function FeatureReel() {
             type="button"
             role="tab"
             aria-selected={i === index}
-            data-hint={(finished && i === next) || undefined}
             className={s.chip}
             onClick={() => go(i, "chip")}
           >
@@ -294,6 +296,7 @@ export function FeatureReel() {
               still={still}
               live={client}
               restart={seen ? 1 : 0}
+              onEnded={i === index ? complete : undefined}
             />
           ))}
         </Phone>
@@ -301,12 +304,6 @@ export function FeatureReel() {
       <p key={scene.key} className={s.reelCaption} aria-live="polite">
         {scene.caption}
       </p>
-      <button type="button" className={s.nextScene} data-visible={finished || still || undefined} onClick={() => go(next, "next")}>
-        Next: {SCENES[next].chip}
-        <svg viewBox="0 0 16 16" aria-hidden="true">
-          <path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
     </div>
   );
 }
@@ -318,6 +315,7 @@ function SceneLayer({
   still,
   live,
   restart,
+  onEnded,
 }: {
   scene: Scene;
   state: "active" | "past" | "idle";
@@ -325,6 +323,7 @@ function SceneLayer({
   still: boolean;
   live: boolean; // hydrated: videos may mount
   restart: number; // bumps once the phone is properly in view: replay from the first frame
+  onEnded?: () => void;
 }) {
   return (
     <div className={s.scene} data-state={state} data-key={scene.key} aria-hidden={state !== "active"}>
@@ -343,6 +342,7 @@ function SceneLayer({
           fallback={scene.fallback}
           durationMs={scene.ms}
           restart={state === "active" ? restart : 0}
+          onEnded={onEnded}
         />
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
