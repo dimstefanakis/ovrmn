@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { trackLanding } from "@/lib/pt-analytics";
 import { Phone, prefersReducedMotion, useInView } from "./imessage";
+import { DemoVideo } from "./demo-video";
 import s from "../landing.module.css";
 
 /* ─────────────────────────────────────────────────────────
@@ -22,12 +23,14 @@ import s from "../landing.module.css";
 
 const TIMING = {
   homeHold: 1900,   // the Home Screen, before the tap opens the app
+  recording: 7600,  // the whole recording, for the animated-image fallback that has no "ended"
   perApp:   2000,   // how long each example app holds
 };
 
 const REEL = {
-  video:  "/pt/v2/app-open.mp4",
-  poster: "/pt/v2/app-open-poster.webp",
+  video:    "/pt/v2/app-open.mp4",
+  poster:   "/pt/v2/app-open-poster.webp",
+  fallback: "/pt/v2/app-open-anim.webp",
   home: "OVRMN, on your Home Screen",
   founder: "Built for Dimitris · strength and visible abs",
   apps: [
@@ -43,18 +46,16 @@ export function AppReel() {
   const [index, setIndex] = useState(-1); // -1: the founder's recording; 0…n: example apps
   const [run, setRun] = useState(0);
 
-  // The recording mounts (autoplay, muted, inline) once the phone is in view, and remounts on replay:
-  // iOS Safari reliably autoplays a fresh muted inline video, unlike a later play() call.
-  const [reduce, setReduce] = useState(false);
+  // The recording mounts once the phone is in view and remounts on replay. It plays with Reduce
+  // Motion too (a short, muted recording of the product); DemoVideo falls back to an animated
+  // image where iOS blocks video (Low Power Mode).
   const [home, setHome] = useState(true); // the Home Screen part of the recording
   useEffect(() => {
     if (!seen) return;
     const timers = [
       setTimeout(() => {
-        const reduced = prefersReducedMotion();
-        setReduce(reduced);
-        setIndex(reduced ? 0 : -1);
-        setHome(!reduced);
+        setIndex(-1);
+        setHome(true);
       }, 0),
       setTimeout(() => setHome(false), TIMING.homeHold),
     ];
@@ -72,23 +73,19 @@ export function AppReel() {
   return (
     <div ref={ref} className={s.reel}>
       <Phone label="A real recording: the OVRMN app on an iPhone Home Screen opening the founder's personal app, followed by example apps built for other people">
-        {seen && !reduce ? (
-          <video
+        {seen ? (
+          <DemoVideo
             key={run}
             className={s.reelVideo}
-            data-on={index < 0 || undefined}
             src={REEL.video}
             poster={REEL.poster}
-            muted
-            playsInline
-            autoPlay
-            preload="auto"
+            fallback={REEL.fallback}
+            durationMs={TIMING.recording}
             onEnded={() => setIndex(0)}
-            onError={() => setIndex(0)}
           />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
-          <img className={s.reelVideo} data-on={index < 0 || undefined} src={REEL.poster} alt="" />
+          <img className={s.reelVideo} src={REEL.poster} alt="" />
         )}
         <div className={s.reelApps} data-on={index >= 0 || undefined}>
           {REEL.apps.map((app, i) => (

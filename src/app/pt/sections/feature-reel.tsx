@@ -33,6 +33,7 @@ import {
   type Message,
 } from "./imessage";
 import { REEL_FOOD, REEL_PAGE, REEL_RECAP, REEL_SESSION } from "./threads";
+import { DemoVideo } from "./demo-video";
 import s from "../landing.module.css";
 
 /* ─────────────────────────────────────────────────────────
@@ -55,9 +56,10 @@ import s from "../landing.module.css";
  *
  * Transitions: a short sideways slide (10%, drawer curve) with an opacity fade, no
  * blur, so screens stay sharp mid-transition; @starting-style covers remounts.
- * Nothing plays until the phone is 55% on screen (or a scene is picked): on phones it only
- * peeks at the fold, and the lock screen's notifications land on its lower half.
- * Reduced motion: still frames, Next always visible.
+ * The opening clip starts on load and replays from its first frame the first time the phone is
+ * 55% on screen (on phones it only peeks at the fold, and the lock screen's notifications land on
+ * its lower half). If iOS blocks video (Low Power Mode), an animated-image copy plays instead.
+ * Reduced motion: static threads and transitions, Next always visible; product recordings still play.
  * ───────────────────────────────────────────────────────── */
 
 const TIMING = {
@@ -74,18 +76,18 @@ const TIMING = {
 type Scene = { key: string; chip: string; caption: string } & (
   | { kind: "thread"; messages: Message[] }
   | { kind: "image"; src: string; alt: string }
-  | { kind: "video"; src: string; poster: string; ms: number }
+  | { kind: "video"; src: string; poster: string; fallback: string; ms: number }
 );
 
 const SCENES: Scene[] = [
-  { key: "first", chip: "Texts first", caption: "OVRMN texts first. Nothing to remember.", kind: "video", src: "/pt/v2/lock.mp4", poster: "/pt/v2/lock-poster.webp", ms: TIMING.lock },
+  { key: "first", chip: "Texts first", caption: "OVRMN texts first. Nothing to remember.", kind: "video", src: "/pt/v2/lock.mp4", poster: "/pt/v2/lock-poster.webp", fallback: "/pt/v2/lock-anim.webp", ms: TIMING.lock },
   { key: "workouts", chip: "Workouts", caption: "Today’s session, built around your week.", kind: "thread", messages: REEL_SESSION },
   { key: "food", chip: "Food", caption: "One photo. The numbers and the next step.", kind: "thread", messages: REEL_FOOD },
   { key: "form", chip: "Form", caption: "A frame from your set, with the fix drawn on.", kind: "image", src: "/pt/v2/real-form-feedback.webp", alt: "Real conversation: a dumbbell-row video frame and an edited illustration with arrows showing how to keep the shoulder facing the floor" },
   { key: "finds", chip: "Finds", caption: "Real menus and orders that fit your goal.", kind: "image", src: "/pt/v2/real-food-finds.webp", alt: "Real conversation: OVRMN recommends breakfast options from a real menu and shares the link" },
   { key: "check-ins", chip: "Check-ins", caption: "Your week, summed up before you ask.", kind: "thread", messages: REEL_RECAP },
   { key: "pages", chip: "Pages", caption: "Plans and lists you can keep.", kind: "thread", messages: REEL_PAGE },
-  { key: "app", chip: "Your app", caption: "Your own app, built from your texts.", kind: "video", src: "/pt/v2/app-open.mp4", poster: "/pt/v2/app-open-poster.webp", ms: TIMING.app },
+  { key: "app", chip: "Your app", caption: "Your own app, built from your texts.", kind: "video", src: "/pt/v2/app-open.mp4", poster: "/pt/v2/app-open-poster.webp", fallback: "/pt/v2/app-open-anim.webp", ms: TIMING.app },
 ];
 
 /* The hero sentence. Plain strings are text; tuples are [phrase, scene, icon]. */
@@ -137,11 +139,11 @@ export function ReelProvider({ children }: { children: ReactNode }) {
   const [visits, setVisits] = useState<number[]>(() => SCENES.map(() => 0));
   const [finished, setFinished] = useState(false); // played through: hint the next chip
   const [still, setStill] = useState(false);
-  // iOS Safari won't autoplay a <video> that arrives in the server HTML, only one created after
-  // hydration, so the server renders posters and videos mount once this flips.
+  // Render posters on the server, then mount videos with their muted/inline playback setup
+  // after hydration. DemoVideo handles browsers that refuse autoplay.
   const [client, setClient] = useState(false);
-  // Scenes wait until the phone is mostly visible: on a phone it peeks at the fold, and the lock
-  // screen's notifications land on its lower half, so playing on load would finish unseen.
+  // Threads and the next-scene hint wait until the phone is mostly visible. The opening video
+  // starts at the fold, then restarts once its lower half and notifications are in view.
   const [seen, setSeen] = useState(false);
   const markSeen = useCallback(() => setSeen(true), []);
   const durations = useMemo(() => SCENES.map(duration), []);
@@ -291,6 +293,7 @@ export function FeatureReel() {
               play={i === index && seen}
               still={still}
               live={client}
+              restart={seen ? 1 : 0}
             />
           ))}
         </Phone>
@@ -314,12 +317,14 @@ function SceneLayer({
   play,
   still,
   live,
+  restart,
 }: {
   scene: Scene;
   state: "active" | "past" | "idle";
   play: boolean;
   still: boolean;
   live: boolean; // hydrated: videos may mount
+  restart: number; // bumps once the phone is properly in view: replay from the first frame
 }) {
   return (
     <div className={s.scene} data-state={state} data-key={scene.key} aria-hidden={state !== "active"}>
@@ -327,23 +332,17 @@ function SceneLayer({
         <ReelThread messages={scene.messages} play={play} still={still} />
       ) : scene.kind === "image" ? (
         <Image className={s.sceneShot} src={scene.src} alt={scene.alt} width={1260} height={2736} unoptimized />
-      ) : // One decoder at a time: the lock video stays through its own lift, the others only while active.
-      // A video mounts when its scene starts playing, so it always plays from the first frame.
-      live && !still && ((state === "active" && play) || (state === "past" && scene.key === "first")) ? (
-        <video
+      ) : // Videos start as soon as the page is live (also with Reduce Motion: they're short, muted
+      // recordings of the product) and replay from the start the first time the phone is in view.
+      // One decoder at a time: the lock video stays through its own lift, the others only while active.
+      live && (state === "active" || (state === "past" && scene.key === "first")) ? (
+        <DemoVideo
           className={s.sceneShot}
           src={scene.src}
           poster={scene.poster}
-          muted
-          playsInline
-          autoPlay
-          preload="auto"
-          // Belt and braces for Safari: set muted on the element and ask it to play once mounted.
-          ref={(video) => {
-            if (!video || state !== "active") return;
-            video.muted = true;
-            void video.play().catch(() => {});
-          }}
+          fallback={scene.fallback}
+          durationMs={scene.ms}
+          restart={state === "active" ? restart : 0}
         />
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
