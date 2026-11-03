@@ -56,9 +56,8 @@ import s from "../landing.module.css";
  *
  * Transitions: a short sideways slide (10%, drawer curve) with an opacity fade, no
  * blur, so screens stay sharp mid-transition; @starting-style covers remounts.
- * The opening clip starts on load and replays from its first frame the first time the phone is
- * 55% on screen (on phones it only peeks at the fold, and the lock screen's notifications land on
- * its lower half). If iOS blocks video (Low Power Mode), an animated-image copy plays instead.
+ * Playback starts after hydration and continues through scrolling. Only selecting a scene
+ * restarts it. If iOS blocks video, an animated-image copy plays instead.
  * Reduced motion: static threads and transitions; the demo still advances automatically.
  * ───────────────────────────────────────────────────────── */
 
@@ -69,7 +68,6 @@ const TIMING = {
   app:         8000,   // the app recording (7.6s) plus a beat
   swipe:         40,   // px of horizontal travel that counts as a swipe on the phone
   scrollGap:     16,   // px left above the chips when a phrase brings the demo into view
-  visible:     0.55,   // share of the phone on screen before the first scene starts playing
 };
 
 type Scene = { key: string; chip: string; caption: string } & (
@@ -117,8 +115,6 @@ function duration(scene: Scene) {
 type Via = "chip" | "swipe" | "phrase" | "auto";
 type Reel = {
   client: boolean;
-  seen: boolean; // the phone has been mostly on screen (or the visitor picked a scene)
-  markSeen: () => void;
   index: number;
   previous: number | null;
   visits: number[];
@@ -140,10 +136,6 @@ export function ReelProvider({ children }: { children: ReactNode }) {
   // Render posters on the server, then mount videos with their muted/inline playback setup
   // after hydration. DemoVideo handles browsers that refuse autoplay.
   const [client, setClient] = useState(false);
-  // The automatic sequence waits until the phone is mostly visible. The opening video
-  // starts at the fold, then restarts once its lower half and notifications are in view.
-  const [seen, setSeen] = useState(false);
-  const markSeen = useCallback(() => setSeen(true), []);
   const durations = useMemo(() => SCENES.map(duration), []);
 
   useEffect(() => {
@@ -159,26 +151,25 @@ export function ReelProvider({ children }: { children: ReactNode }) {
     setPrevious(target === index ? previous : index);
     setIndex(target);
     setVisits((all) => all.map((n, i) => (i === target ? n + 1 : n)));
-    setSeen(true);
     // Keep automatic progression out of the manual-selection funnel.
     if (via !== "auto") trackLanding("demo_feature_selected", { feature: SCENES[target].key, via });
   }, [index, previous]);
 
   const complete = useCallback(() => {
-    if (seen) go(index + 1, "auto");
-  }, [seen, index, go]);
+    if (client) go(index + 1, "auto");
+  }, [client, index, go]);
 
   // Recordings advance on their real ended event (or the loaded fallback's completion).
   // Conversations get their full typing schedule plus reading time; screenshots hold still.
   // Choosing any scene resets its timer, then automatic progression continues from there.
   useEffect(() => {
-    if (!seen || SCENES[index].kind === "video") return;
+    if (!client || SCENES[index].kind === "video") return;
     const timer = setTimeout(complete, durations[index]);
     return () => clearTimeout(timer);
-  }, [index, visits, seen, durations, complete]);
+  }, [index, visits, client, durations, complete]);
 
   return (
-    <ReelContext.Provider value={{ client, seen, markSeen, index, previous, visits, complete, still, go, stage }}>
+    <ReelContext.Provider value={{ client, index, previous, visits, complete, still, go, stage }}>
       {children}
     </ReelContext.Provider>
   );
@@ -224,9 +215,8 @@ export function FeatureSentence() {
 }
 
 export function FeatureReel() {
-  const { client, seen, markSeen, index, previous, visits, complete, still, go, stage } = useReel();
+  const { client, index, previous, visits, complete, still, go, stage } = useReel();
   const chips = useRef<HTMLDivElement>(null);
-  const phone = useRef<HTMLDivElement>(null);
   const swipe = useRef<{ x: number; y: number } | null>(null);
 
   // Update only the active chip's paint, without rerendering the conversations every frame.
@@ -237,7 +227,7 @@ export function FeatureReel() {
 
   useEffect(() => {
     showProgress(0);
-    if (!seen || SCENES[index].kind === "video") return;
+    if (!client || SCENES[index].kind === "video") return;
     const started = performance.now();
     const ms = duration(SCENES[index]);
     let frame: number;
@@ -247,20 +237,7 @@ export function FeatureReel() {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [index, visits, seen, showProgress]);
-
-  useEffect(() => {
-    const node = phone.current;
-    if (!node || seen) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.intersectionRatio >= TIMING.visible) markSeen();
-      },
-      { threshold: [TIMING.visible] },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [seen, markSeen]);
+  }, [index, visits, client, showProgress]);
 
   // Keep the active chip in view in the scrolling row, without moving the page.
   useEffect(() => {
@@ -291,7 +268,6 @@ export function FeatureReel() {
         ))}
       </div>
       <div
-        ref={phone}
         className={s.swipeArea}
         onPointerDown={(event) => {
           swipe.current = { x: event.clientX, y: event.clientY };
@@ -314,10 +290,9 @@ export function FeatureReel() {
               key={`${item.key}-${visits[i]}`}
               scene={item}
               state={i === index ? "active" : i === previous ? "past" : "idle"}
-              play={i === index && seen}
+              play={i === index && client}
               still={still}
               live={client}
-              restart={seen ? 1 : 0}
               onEnded={i === index ? complete : undefined}
               onProgress={i === index ? showProgress : undefined}
             />
@@ -337,7 +312,6 @@ function SceneLayer({
   play,
   still,
   live,
-  restart,
   onEnded,
   onProgress,
 }: {
@@ -346,7 +320,6 @@ function SceneLayer({
   play: boolean;
   still: boolean;
   live: boolean; // hydrated: videos may mount
-  restart: number; // bumps once the phone is properly in view: replay from the first frame
   onEnded?: () => void;
   onProgress?: (fraction: number) => void;
 }) {
@@ -357,7 +330,7 @@ function SceneLayer({
       ) : scene.kind === "image" ? (
         <Image className={s.sceneShot} src={scene.src} alt={scene.alt} width={1260} height={2736} unoptimized />
       ) : // Videos start as soon as the page is live (also with Reduce Motion: they're short, muted
-      // recordings of the product) and replay from the start the first time the phone is in view.
+      // recordings of the product). Scroll never seeks or remounts the current recording.
       // One decoder at a time: the lock video stays through its own lift, the others only while active.
       live && (state === "active" || (state === "past" && scene.key === "first")) ? (
         <DemoVideo
@@ -366,7 +339,6 @@ function SceneLayer({
           poster={scene.poster}
           fallback={scene.fallback}
           durationMs={scene.ms}
-          restart={state === "active" ? restart : 0}
           onEnded={onEnded}
           onProgress={onProgress}
         />
