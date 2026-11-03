@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
  * A muted demo recording with an animated-image fallback for blocked playback.
  *
  * - Mounts client-side (callers render it after hydration) and calls play() straight away.
- * - `restart` bumping replays it from the first frame (e.g. the first time it's properly in view).
+ * - Callers remount it only for explicit scene selection/replay or the next automatic loop.
  * - When the browser refuses playback, it swaps in the same recording as an animated image.
  *   Its playback clock starts after the image loads, so slow downloads cannot skip the demo.
  */
@@ -15,7 +15,6 @@ export function DemoVideo({
   poster,
   fallback,
   durationMs,
-  restart = 0,
   className,
   onEnded,
   onProgress,
@@ -24,7 +23,6 @@ export function DemoVideo({
   poster: string;
   fallback: string;
   durationMs: number;
-  restart?: number;
   className?: string;
   onEnded?: () => void;
   onProgress?: (fraction: number) => void;
@@ -32,6 +30,9 @@ export function DemoVideo({
   const video = useRef<HTMLVideoElement>(null);
   const [blocked, setBlocked] = useState(false);
   const ended = useRef(onEnded);
+  const progress = useRef(onProgress);
+  const hasProgress = onProgress !== undefined;
+  useEffect(() => { progress.current = onProgress; }, [onProgress]);
   useEffect(() => {
     ended.current = onEnded;
   }, [onEnded]);
@@ -42,19 +43,33 @@ export function DemoVideo({
     node.muted = true;
     node.defaultMuted = true;
     node.playsInline = true;
-    if (restart) node.currentTime = 0;
     void node.play().catch((error: unknown) => {
       // Seeking or unmounting may abort a pending play. Those are not playback-policy failures.
       if (video.current !== node) return;
       if (error instanceof DOMException &&
           (error.name === "NotAllowedError" || error.name === "NotSupportedError")) setBlocked(true);
     });
-  }, [restart]);
+  }, []);
+
+  // Media timeupdate events may arrive only a few times per second. Paint the fill on
+  // each display frame from the actual media clock, so it stays smooth and stops on stalls.
+  useEffect(() => {
+    const node = video.current;
+    if (blocked || !hasProgress || !node) return;
+    let frame: number;
+    const tick = () => {
+      if (Number.isFinite(node.duration) && node.duration > 0) {
+        progress.current?.(node.currentTime / node.duration);
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [blocked, hasProgress]);
 
   if (blocked)
     return (
       <AnimatedFallback
-        key={restart}
         className={className}
         src={fallback}
         poster={poster}
@@ -74,12 +89,6 @@ export function DemoVideo({
       autoPlay
       preload="auto"
       onEnded={() => ended.current?.()}
-      onTimeUpdate={(event) => {
-        const node = event.currentTarget;
-        if (Number.isFinite(node.duration) && node.duration > 0) {
-          onProgress?.(node.currentTime / node.duration);
-        }
-      }}
       onError={() => setBlocked(true)}
     />
   );
