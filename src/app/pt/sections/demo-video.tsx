@@ -18,6 +18,7 @@ export function DemoVideo({
   restart = 0,
   className,
   onEnded,
+  onProgress,
 }: {
   src: string;
   poster: string;
@@ -26,6 +27,7 @@ export function DemoVideo({
   restart?: number;
   className?: string;
   onEnded?: () => void;
+  onProgress?: (fraction: number) => void;
 }) {
   const video = useRef<HTMLVideoElement>(null);
   const [blocked, setBlocked] = useState(false);
@@ -58,6 +60,7 @@ export function DemoVideo({
         poster={poster}
         durationMs={durationMs}
         onEnded={() => ended.current?.()}
+        onProgress={onProgress}
       />
     );
   return (
@@ -71,27 +74,47 @@ export function DemoVideo({
       autoPlay
       preload="auto"
       onEnded={() => ended.current?.()}
+      onTimeUpdate={(event) => {
+        const node = event.currentTarget;
+        if (Number.isFinite(node.duration) && node.duration > 0) {
+          onProgress?.(node.currentTime / node.duration);
+        }
+      }}
       onError={() => setBlocked(true)}
     />
   );
 }
 
-function AnimatedFallback({ src, poster, durationMs, className, onEnded }: {
+function AnimatedFallback({ src, poster, durationMs, className, onEnded, onProgress }: {
   src: string;
   poster: string;
   durationMs: number;
   className?: string;
   onEnded: () => void;
+  onProgress?: (fraction: number) => void;
 }) {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const ended = useRef(onEnded);
+  const progress = useRef(onProgress);
   useEffect(() => { ended.current = onEnded; }, [onEnded]);
+  useEffect(() => { progress.current = onProgress; }, [onProgress]);
 
   useEffect(() => {
     if (!loaded) return;
+    const started = performance.now();
+    let frame: number | undefined;
+    const tick = () => {
+      progress.current?.(Math.min(1, (performance.now() - started) / durationMs));
+      frame = requestAnimationFrame(tick);
+    };
+    // The shared app reel has no chip, so only animate progress when a caller needs it.
+    if (progress.current) tick();
     const timer = setTimeout(() => ended.current(), durationMs);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      if (frame !== undefined) cancelAnimationFrame(frame);
+    };
   }, [loaded, durationMs]);
 
   // Keep a still if both media formats fail, and let the app reel reach its examples.

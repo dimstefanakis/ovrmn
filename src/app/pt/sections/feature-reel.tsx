@@ -63,8 +63,8 @@ import s from "../landing.module.css";
  * ───────────────────────────────────────────────────────── */
 
 const TIMING = {
-  threadHold:  1800,   // hold a thread's final frame before advancing
-  image:       4000,   // reading time for a screenshot scene
+  threadHold:  1100,   // hold a thread's final frame before advancing
+  image:       3000,   // reading time for a screenshot scene
   lock:        5300,   // the lock screen recording (last notification lands ~4.6s)
   app:         8000,   // the app recording (7.6s) plus a beat
   swipe:         40,   // px of horizontal travel that counts as a swipe on the phone
@@ -229,6 +229,26 @@ export function FeatureReel() {
   const phone = useRef<HTMLDivElement>(null);
   const swipe = useRef<{ x: number; y: number } | null>(null);
 
+  // Update only the active chip's paint, without rerendering the conversations every frame.
+  const showProgress = useCallback((fraction: number) => {
+    const chip = chips.current?.children[index] as HTMLElement | undefined;
+    chip?.style.setProperty("--progress", String(Math.max(0, Math.min(1, fraction))));
+  }, [index]);
+
+  useEffect(() => {
+    showProgress(0);
+    if (!seen || SCENES[index].kind === "video") return;
+    const started = performance.now();
+    const ms = duration(SCENES[index]);
+    let frame: number;
+    const tick = () => {
+      showProgress((performance.now() - started) / ms);
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [index, visits, seen, showProgress]);
+
   useEffect(() => {
     const node = phone.current;
     if (!node || seen) return;
@@ -261,10 +281,12 @@ export function FeatureReel() {
             type="button"
             role="tab"
             aria-selected={i === index}
+            data-complete={i < index || undefined}
             className={s.chip}
             onClick={() => go(i, "chip")}
           >
-            {item.chip}
+            <span>{item.chip}</span>
+            <span className={s.chipFill} aria-hidden="true">{item.chip}</span>
           </button>
         ))}
       </div>
@@ -297,6 +319,7 @@ export function FeatureReel() {
               live={client}
               restart={seen ? 1 : 0}
               onEnded={i === index ? complete : undefined}
+              onProgress={i === index ? showProgress : undefined}
             />
           ))}
         </Phone>
@@ -316,6 +339,7 @@ function SceneLayer({
   live,
   restart,
   onEnded,
+  onProgress,
 }: {
   scene: Scene;
   state: "active" | "past" | "idle";
@@ -324,6 +348,7 @@ function SceneLayer({
   live: boolean; // hydrated: videos may mount
   restart: number; // bumps once the phone is properly in view: replay from the first frame
   onEnded?: () => void;
+  onProgress?: (fraction: number) => void;
 }) {
   return (
     <div className={s.scene} data-state={state} data-key={scene.key} aria-hidden={state !== "active"}>
@@ -343,6 +368,7 @@ function SceneLayer({
           durationMs={scene.ms}
           restart={state === "active" ? restart : 0}
           onEnded={onEnded}
+          onProgress={onProgress}
         />
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
