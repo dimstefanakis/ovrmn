@@ -4,6 +4,25 @@
 
 The homepage on `ovrmn.com` and `www.ovrmn.com` redirects to `/pt-waitlist` through Next.js routing on Vercel. Only `/` matches; PT, membership, API and generated-page routes retain their existing behavior. Query parameters pass through, including referral and campaign tags. The redirect uses 307 so browsers do not permanently cache this product choice. Other hostnames served by the project keep their existing homepage, and the previous homepage remains in the source. No Porkbun DNS forwarding is needed.
 
+## Landing page v2 (November 2026)
+
+The page follows a short, digestible flow:
+- **Hero:** one sentence whose underlined feature phrases (texts you first, workouts, a plate photo, form, what to order, your week, your own app) each play their scene on the phone below; chips above the phone, a swipe, and **Next** do the same. Nothing advances by itself, and nothing plays until the phone is 55% on screen (on phones it only peeks at the fold, and the lock screen's notifications land on its lower half); videos mount after hydration, then play from the first frame. The scenes are real: a simulator lock-screen recording, the founder's thread, real screenshots, and the real OVRMN iPhone app opening from the Home Screen.
+- **What OVRMN does:** a grid of eight features.
+- **A week with OVRMN:** a timeline of the founder's real messages, bubbles playing in as they scroll into view.
+- **An app built just for you:** the real OVRMN app (installed in the simulator, paired to the founder's account) opening from the Home Screen into his personal app, then example apps: the synthetic Maya and Sofia builds, captured full screen in the same simulator at 1206 × 2622 and served unoptimized (never re-encode them through `next/image`).
+- **Real screenshots, then your data:** never sold, forgotten on request, deleted when you ask.
+- **Three steps, then a one-line price, then the FAQ and the closing form.**
+
+The waitlist words are unchanged; the hero, the closing section and the dialog share one signup state. A top bar with **Text OVRMN** slides in once the whole hero has scrolled away (iOS 26 Safari floats its toolbar over the bottom of the page) and opens the same form as a bottom sheet on phones.
+
+- Conversation content lives in `src/app/pt/sections/threads.ts`: the founder's own messages, word for word, used with his permission. Never put a client's messages there. Maya and Sofia in the app reel are example people, and the page says so.
+- Every feature claim on the page maps to something live and default-on (checked Nov 3, 2026): free week with no card, a price worked out with the coach in chat, personal apps, pages, check-ins, voice notes and videos, any language, quiet hours and stop.
+- Funnel events (PostHog, never the phone number): `landing_cta_clicked`, `signup_form_started`, `signup_country_changed`, `signup_validation_failed`, `signup_submit_failed`, `signup_access_granted`, `signup_listed`, `text_ovrmn_clicked` (with `in_app_browser`), `line_number_copied`, `landing_section_viewed`, `demo_replayed`, `demo_feature_selected`.
+- In Facebook, Instagram and Messenger webviews, "You're in." also shows the line with a copy button and a hint to open the page in Safari.
+- Motion: CSS transitions, `@starting-style` and IntersectionObserver only, transform/opacity/clip-path, once per element; `prefers-reduced-motion` shows final states. No gradients.
+- Assets in `public/pt/v2/` come from an iPhone 17 Pro simulator (iOS 26.5) and the founder’s own media; raw captures stay in the main repo’s git-ignored `.local/landing-moments`. Simulator recordings are variable frame rate: convert to constant 30 fps before cutting, and encode H.264 at level 5.0 or lower (iOS will not decode 6.x).
+
 ## Airtable setup
 
 Use the separate **PT** table, not the website's demo-leads table:
@@ -39,7 +58,7 @@ Enrollment calls `POST /enroll` with `{ phone, timezone, consent: true, provider
 
 ## Behavior
 
-- Native country picker with no assumed country. National numbers require an explicit selection, then show the flag, calling code and country-specific mobile example. A full international number switches the picker automatically. Browser location, language and timezone never determine a phone's country. The server still requires a normalized international number. No OTP: ownership is **not verified**.
+- Native country picker, preselected from the visitor's IP country: the static page renders 🇺🇸 +1 (94% of visitors were in the US, Oct 4 – Nov 2, 2026), then `GET /api/geo` reads Vercel's `x-vercel-ip-country` header (validated against libphonenumber, nothing logged or stored) and switches the picker, unless the visitor has already chosen a code or typed a number. Unknown or missing countries (and local dev) stay on +1. The flag, calling code and country-specific example stay visible; one tap changes them, and a full international number (typed, pasted or autofilled) switches the picker automatically. Browser language and timezone are not used. The server still requires a normalized international number. No OTP: ownership is **not verified**.
 - The action is **Request access**. Confirmed enrollment shows **You’re in** and the assigned iMessage line. The draft is Greek on Greek-language devices, English otherwise. If enrollment is unavailable or the browser has no valid timezone, the saved request stays on the waitlist. Country names/examples are generated server-side and serialized to avoid differences between browser and server locale data.
 - A single Airtable PATCH with `performUpsert.fieldsToMergeOn: ["Phone"]` handles repeated submissions. Supplied campaign tags are latest-touch; omitted tags and Airtable's original created time are preserved. Manually introducing duplicate Phone rows causes Airtable to reject ambiguous upserts rather than claim success.
 - Confirm only after Airtable returns the expected saved record. A retry after a lost response targets the same normalized Phone.
@@ -50,7 +69,7 @@ Enrollment calls `POST /enroll` with `{ phone, timezone, consent: true, provider
 
 ## Verification
 
-Run `bun test src/lib/pt-waitlist.test.ts src/app/pt-waitlist/waitlist.test.tsx src/app/pt/first-text.test.ts`, `bunx tsc --noEmit`, and `bun run build`.
+Run `bun test src/lib/pt-waitlist.test.ts src/app/pt-waitlist/waitlist.test.tsx src/app/pt/first-text.test.ts src/lib/join-pages.test.tsx`, `bunx tsc --noEmit`, `bunx eslint src/app/pt src/app/pt-waitlist`, and `bun run build`.
 
 Provider tests mock Airtable, including duplicate upsert payloads and provider failures. Before deploying, configure the real table and verify a reserved test number saves once on repeated submission; remove only that test record afterward. Do not mistake a mocked test for live Airtable acceptance.
 

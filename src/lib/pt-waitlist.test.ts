@@ -460,3 +460,12 @@ test("without a confirmed spot the person stays on the waitlist, and nothing pri
     );
   assert.equal(backend, 0);
 });
+
+test("the IP country preselects only countries we can format, upper-cased", async () => {
+  const { visitorCountry } = await import("./pt-waitlist");
+  const from = (value?: string) => visitorCountry(new Headers(value === undefined ? {} : { "x-vercel-ip-country": value }));
+  assert.equal(from("GR"), "GR");
+  assert.equal(from("us"), "US");
+  assert.equal(from(" PT "), "PT");
+  for (const value of [undefined, "", "EU", "XX", "USA", "1", "G R"]) assert.equal(from(value), null, String(value));
+});

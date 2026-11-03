@@ -24,3 +24,27 @@ export function trackPtLead(eventId: string) {
     window.fbq("trackSingle",getMetaPixelIdForPath("/pt-waitlist"),"Lead",{}, { eventID: eventId });
   }
 }
+
+/** Landing funnel events. Never pass the phone number or anything typed into the form. */
+export type LandingEvent =
+  | "landing_cta_clicked"
+  | "signup_form_started"
+  | "signup_country_changed"
+  | "signup_validation_failed"
+  | "signup_submit_failed"
+  | "signup_access_granted"
+  | "signup_listed"
+  | "text_ovrmn_clicked"
+  | "line_number_copied"
+  | "landing_section_viewed"
+  | "demo_replayed"
+  | "demo_feature_selected";
+
+export function trackLanding(event: LandingEvent, properties: Record<string, string | number | boolean> = {}) {
+  try { posthog.capture(event, { ...properties, page: "pt-landing-v2" }); } catch { /* SDK may be disabled or blocked. */ }
+}
+
+/** Facebook, Instagram and Messenger webviews often fail to hand an sms: link to Messages. */
+export function inAppBrowser(userAgent: string) {
+  return /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger/i.test(userAgent);
+}
