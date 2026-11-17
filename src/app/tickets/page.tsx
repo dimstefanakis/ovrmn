@@ -6,6 +6,8 @@ import { MetaTrackedLink } from "@/components/meta-tracked-link";
 import { MetaViewContent } from "@/components/meta-view-content";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.senec.ai"),
+  alternates: { canonical: "/tickets" },
   title: "OVRMN | Support Tickets",
   description:
     "Automate repetitive support tickets, reply with real context, and escalate the tricky ones with the full story attached.",

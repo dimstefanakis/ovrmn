@@ -3,6 +3,8 @@ import { BookDemoFlow } from "@/app/book/book-demo-flow";
 import { MetaViewContent } from "@/components/meta-view-content";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.senec.ai"),
+  alternates: { canonical: "/book" },
   title: "Book a Demo | OVRMN",
   description:
     "Tell OVRMN what keeps coming up and book a tailored pilot.",

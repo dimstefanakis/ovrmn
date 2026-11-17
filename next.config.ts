@@ -1,15 +1,21 @@
 import type { NextConfig } from "next";
 
+// ovrmn.com is the fitness site: its home is the waitlist landing (src/app/page.tsx).
+// The enterprise site is www.senec.ai, same deployment: its home is src/app/enterprise/page.tsx.
+const ENTERPRISE_HOST = "(?:www\\.)?senec\\.ai";
+
+// /enterprise itself stays reachable; its canonical tag points search engines at www.senec.ai/.
 const nextConfig: NextConfig = {
-  async redirects() {
-    return [
-      {
-        source: "/",
-        has: [{ type: "host", value: "(?:www\\.)?ovrmn\\.com" }],
-        destination: "/pt-waitlist",
-        permanent: false,
-      },
-    ];
+  async rewrites() {
+    return {
+      beforeFiles: [
+        { source: "/", has: [{ type: "host", value: ENTERPRISE_HOST }], destination: "/enterprise" },
+        // public/robots.txt and public/sitemap.xml are ovrmn.com's; senec.ai gets its own.
+        { source: "/:file(robots\\.txt|sitemap\\.xml)", has: [{ type: "host", value: ENTERPRISE_HOST }], destination: "/hosts/senec.ai/:file" },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
   },
   async headers() {
     const headers = [

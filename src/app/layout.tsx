@@ -3,6 +3,7 @@ import { Playfair_Display, IBM_Plex_Mono, Geist } from "next/font/google";
 import Script from "next/script";
 import { LinkedInInsightTag } from "@/components/linkedin-insight-tag";
 import { MetaPixel } from "@/components/meta-pixel";
+import { FITNESS_ORIGIN } from "@/lib/site-host";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -32,9 +33,11 @@ const chatGptPixelConfiguration = chatGptPixelId
     }).replaceAll("<", "\\u003c")
   : null;
 
+// Defaults for pages that set nothing. Pages own their canonical and share cards.
 export const metadata: Metadata = {
-  title: "OVRMN | Intelligence Observatory",
-  description: "Tailored AI agents and bespoke intelligence systems for the modern enterprise.",
+  metadataBase: new URL(FITNESS_ORIGIN),
+  title: "OVRMN — Your personal trainer in iMessage",
+  description: "OVRMN is an AI personal trainer you text in iMessage.",
 };
 
 export default function RootLayout({
