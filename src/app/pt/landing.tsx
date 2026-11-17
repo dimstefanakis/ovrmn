@@ -35,21 +35,58 @@ const serif = localFont({
   display: "swap",
 });
 
+export const SITE_URL = "https://www.ovrmn.com";
+const SHARE_TITLE = "OVRMN — Your personal trainer in iMessage";
+const DESCRIPTION =
+  "OVRMN is an AI personal trainer you text in iMessage. Workouts for your equipment, food numbers from a photo, form checks and check-ins. First week free.";
+
+/** Shared by /, /pt-waitlist and /pt. All three point search engines at / (also from www.senec.ai). */
 export const ptMetadata: Metadata = {
-  metadataBase: new URL("https://ovrmn.com"),
-  title: "OVRMN — Your personal trainer in iMessage",
-  description:
-    "An AI personal trainer for your workouts, food, and progress. Right in iMessage.",
-  robots: { index: false, follow: false },
-  alternates: { canonical: null },
+  metadataBase: new URL(SITE_URL),
+  title: "AI personal trainer in iMessage | OVRMN",
+  description: DESCRIPTION,
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "OVRMN — Your personal trainer in iMessage",
-    description:
-      "An AI personal trainer for your workouts, food, and progress. Right in iMessage.",
+    type: "website",
+    url: "/",
     siteName: "OVRMN",
-    images: ["/pt/stride.webp"],
+    title: SHARE_TITLE,
+    description: DESCRIPTION,
+    images: [{ url: "/pt/og.jpg", width: 1200, height: 630, alt: "A stone athlete climbing a step, lit in low light." }],
   },
+  twitter: { card: "summary_large_image", title: SHARE_TITLE, description: DESCRIPTION, images: ["/pt/og.jpg"] },
 };
+
+/** Organization + WebSite structured data for the home page. Facts only, nothing the page doesn't say. */
+export function HomeStructuredData() {
+  const data = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${SITE_URL}/#organization`,
+        name: "OVRMN",
+        url: `${SITE_URL}/`,
+        logo: `${SITE_URL}/icon.png`,
+        email: "support@ovrmn.com",
+        description: DESCRIPTION,
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        name: "OVRMN",
+        url: `${SITE_URL}/`,
+        publisher: { "@id": `${SITE_URL}/#organization` },
+      },
+    ],
+  };
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }}
+    />
+  );
+}
 
 const REAL_MESSAGES = [
   { src: "/pt/v2/real-meal-photo.webp", title: "A photo, a practical next step.", alt: "Real iMessage conversation: a meal photo of chicken strips and potatoes, followed by OVRMN suggesting a larger protein serving to support muscle growth." },

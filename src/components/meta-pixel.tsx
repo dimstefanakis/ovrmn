@@ -25,7 +25,7 @@ export function MetaPixel() {
       lastPathname.current !== pathname &&
       typeof window.fbq === "function"
     ) {
-      window.fbq("trackSingle",getMetaPixelIdForPath(pathname),"PageView");
+      window.fbq("trackSingle",getMetaPixelIdForPath(pathname, window.location.host),"PageView");
     }
 
     lastPathname.current = pathname;
@@ -49,7 +49,8 @@ export function MetaPixel() {
           s.parentNode.insertBefore(t,s)}(window, document,'script',
           'https://connect.facebook.net/en_US/fbevents.js');
           ${pixels.map((id)=>`fbq('init', '${id}');`).join("\n")}
-          fbq('trackSingle', /^\\/pt(?:-waitlist)?(?:\\/|$)/.test(window.location.pathname)
+          fbq('trackSingle', (/^\\/pt(?:-waitlist)?(?:\\/|$)/.test(window.location.pathname)
+            || (window.location.pathname === '/' && !/(?:^|\\.)senec\\.ai(?::\\d+)?$/i.test(window.location.host)))
             ? '${process.env.NEXT_PUBLIC_PT_META_PIXEL_ID || getMetaPixelId()}' : '${getMetaPixelId()}', 'PageView');
           }
         `}

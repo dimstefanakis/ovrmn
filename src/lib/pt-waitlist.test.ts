@@ -179,8 +179,10 @@ test("PT attribution accepts bounded IDs and campaign tags, stripping contacts, 
   const previous = process.env.NEXT_PUBLIC_PT_META_PIXEL_ID;
   try {
     process.env.NEXT_PUBLIC_PT_META_PIXEL_ID = "123456";
-    for (const path of ["/pt", "/pt-waitlist", "/pt/a"]) assert.equal(getMetaPixelIdForPath(path), "123456");
-    for (const path of ["/", "/book", "/pt-other", "/joining"]) assert.equal(getMetaPixelIdForPath(path), getMetaPixelId());
+    for (const path of ["/", "/pt", "/pt-waitlist", "/pt/a"]) assert.equal(getMetaPixelIdForPath(path, "www.ovrmn.com"), "123456");
+    assert.equal(getMetaPixelIdForPath("/"), "123456");
+    for (const path of ["/book", "/pt-other", "/joining"]) assert.equal(getMetaPixelIdForPath(path), getMetaPixelId());
+    for (const host of ["www.senec.ai", "senec.ai"]) assert.equal(getMetaPixelIdForPath("/", host), getMetaPixelId());
   } finally {
     if (previous === undefined) delete process.env.NEXT_PUBLIC_PT_META_PIXEL_ID;
     else process.env.NEXT_PUBLIC_PT_META_PIXEL_ID = previous;
