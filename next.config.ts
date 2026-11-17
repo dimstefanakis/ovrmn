@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
     return {
       beforeFiles: [
         { source: "/", has: [{ type: "host", value: ENTERPRISE_HOST }], destination: "/enterprise" },
+        // public/robots.txt and public/sitemap.xml are ovrmn.com's; senec.ai gets its own.
+        { source: "/:file(robots\\.txt|sitemap\\.xml)", has: [{ type: "host", value: ENTERPRISE_HOST }], destination: "/hosts/senec.ai/:file" },
       ],
       afterFiles: [],
       fallback: [],
