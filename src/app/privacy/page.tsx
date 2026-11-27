@@ -8,7 +8,7 @@ export default function PrivacyPage() {
   return <MembershipShell><article className={s.policy}>
     <p className={s.kicker}>Legal</p>
     <h1>Privacy.</h1>
-    <p className={s.updated}>Last updated October 30, 2026</p>
+    <p className={s.updated}>Last updated November 27, 2026</p>
 
     <h2>Who we are</h2>
     <p>OVRMN is the controller of your personal data; the company behind it is named in our <a href="/terms">Terms</a>. Contact us about privacy at <a href="mailto:support@ovrmn.com">support@ovrmn.com</a> or in your Messages conversation.</p>
@@ -31,12 +31,17 @@ export default function PrivacyPage() {
     <p>The initial import can include the previous 90 days. New and updated records can sync in the background. The app sends imported records to your OVRMN account so your AI coach can use them for your fitness and nutrition coaching. Relevant information can be processed by the AI and hosting providers that run that service. We do not sell Health data or use it for advertising.</p>
     <p>You can skip Health access, choose individual categories, or revoke permission in iOS Settings. Revoking permission stops new reads but does not by itself erase records already sent. In the app, <strong>You → Delete my Health data</strong> removes imported Health records and disconnects this iPhone. Your chat and other coaching records remain.</p>
 
+    <h2>Optional photo reading</h2>
+    <p>If you choose it in the OVRMN iPhone app, the app looks through the photos and videos already in your library, on your iPhone, so your AI coach can learn how you eat, train and live. Your photos, videos and thumbnails stay on your iPhone. The app sends short text notes about them to your OVRMN account: what the iPhone recognised in each photo and any text, QR code or barcode in it; when it was taken; its approximate area (a square about 150 metres across) with nearby place names, and altitude and speed where the photo records them; its file name, whether it is a screenshot, video, selfie or favourite, and the names of the albums it belongs to; and, on iPhones that support Apple Intelligence, a short description written by the iPhone&apos;s own model. It counts the people and faces in a photo but does not recognise faces or identify who anyone is. If you answer a question about your photos in the app, or correct something it learned, your answer is kept with those notes.</p>
+    <p>Your AI coach uses these notes, and what it learns from them, for your fitness and nutrition coaching. Relevant information can be processed by the AI and hosting providers that run that service. We do not sell this information or use it for advertising.</p>
+    <p>Photo reading is optional. You can skip it, allow only selected photos, stop a read part way, or revoke access in iOS Settings. Revoking access stops new reads but does not by itself erase notes already sent. In the app, <strong>You → Your photos → ••• → Delete what OVRMN learned</strong> removes the notes and everything learned from them, and your coach is asked to remove anything it carried over from your photos into its coaching records. Your chat and other coaching records remain.</p>
+
     <h2>Optional location sharing</h2>
     <p>If you choose nearby help, the app sends your location, capture time and accuracy to your OVRMN account so your coach can answer nearby questions. Background location updates and proactive nearby suggestions are separate choices. If enabled, background location can update while you use other apps. We keep a latest-location record rather than a location-history document; information about places discussed with your coach can also remain in your chat and coaching records.</p>
     <p>Use <strong>You → Nearby help → Stop sharing and delete latest location</strong> to stop app sharing and delete that record, or revoke permission in iOS Settings. After a Settings change, deletion from OVRMN depends on the app next contacting our server; interrupted deletions are retried. Sharing through Messages or Find My is controlled separately on your phone. We do not use location for advertising.</p>
 
     <h2>Sample account for app review</h2>
-    <p>The app offers a fictional sample account for exploring its screens without a Messages login. Each sign-in creates an independent temporary session with sample training content. Health imports and location coordinates submitted in that session are discarded; they are not attached to a real client account or sent to a coach. The session expires after 24 hours or a server restart, and disconnecting ends it immediately.</p>
+    <p>The app offers a fictional sample account for exploring its screens without a Messages login. Each sign-in creates an independent temporary session with sample training content. Health imports, location coordinates and photo notes submitted in that session are discarded; they are not attached to a real client account or sent to a coach. If you try photo reading there, the app reads your photos on the device as usual and the session shows a labelled sample story instead of a real one. The session expires after 24 hours or a server restart, and disconnecting ends it immediately.</p>
 
     <h2>Why we use it</h2>
     <ul>
@@ -47,7 +52,7 @@ export default function PrivacyPage() {
     <p>We don&apos;t sell your data, and we don&apos;t use it for advertising.</p>
 
     <h2>Who helps us</h2>
-    <p>We use service providers who process data for us under contract to provide hosting and databases, third-party AI processing, Messages delivery, payments, and website analytics. Relevant coaching information, including Health or location information you choose to share, can be processed by the third-party AI service providers used to answer your requests. Some providers are in the United States; transfers rely on the EU–US Data Privacy Framework or the European Commission&apos;s standard contractual clauses.</p>
+    <p>We use service providers who process data for us under contract to provide hosting and databases, third-party AI processing, Messages delivery, payments, and website analytics. Relevant coaching information, including Health, location or photo information you choose to share, can be processed by the third-party AI service providers used to answer your requests. Some providers are in the United States; transfers rely on the EU–US Data Privacy Framework or the European Commission&apos;s standard contractual clauses.</p>
 
     <h2>How long we keep it</h2>
     <p>We keep your coaching data while you use OVRMN. Ask us to forget something and OVRMN stops using it; ask us to delete your account and we delete your data, except billing records we must keep under tax law.</p>
